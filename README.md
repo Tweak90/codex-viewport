@@ -4,7 +4,7 @@
 
 **Your Codex projects, chats and tools in a self-hosted browser interface.**
 
-[Deutsch](README.de.md) · [Documentation](docs/wiki/en-Home.md) · [Releases](https://github.com/Tweak90/codex-web/releases) · [Changelog](CHANGELOG.md)
+[Deutsch](README.de.md) · [Wiki](https://github.com/Tweak90/codex-web/wiki) · [Documentation](docs/wiki/en-Home.md) · [Releases](https://github.com/Tweak90/codex-web/releases) · [Changelog](CHANGELOG.md)
 
 Codex-Web connects to an existing Codex App Server. Run the web container on the same machine or a separate Docker host. Your Codex sign-in, tools and project files stay on the Codex host.
 
@@ -70,7 +70,7 @@ Use the gear button for language, Enter behavior, follow-up handling and applica
 
 ## Documentation and development
 
-The [documentation](docs/wiki/Home.md) starts with a language chooser. It covers installation, usage, troubleshooting, architecture, APIs, data storage and the tech stack. All pages are available in German and English directly in this repository.
+The [Wiki](https://github.com/Tweak90/codex-web/wiki) starts with a language chooser. It covers installation, usage, troubleshooting, architecture, APIs, data storage and the tech stack. All pages are also available in German and English [directly in this repository](docs/wiki/Home.md).
 
 ```bash
 npm ci

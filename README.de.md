@@ -4,7 +4,7 @@
 
 **Codex im Browser: Projekte verwalten, Chats führen und auf einem eigenen Codex-Host arbeiten.**
 
-[English](README.md) · [Dokumentation](docs/wiki/de-Home.md) · [Releases](https://github.com/Tweak90/codex-web/releases) · [Changelog](CHANGELOG.de.md)
+[English](README.md) · [Wiki](https://github.com/Tweak90/codex-web/wiki) · [Dokumentation](docs/wiki/de-Home.md) · [Releases](https://github.com/Tweak90/codex-web/releases) · [Changelog](CHANGELOG.de.md)
 
 Codex-Web ist eine selbstgehostete Oberfläche für einen vorhandenen Codex App Server. Der Web-Container kann auf demselben Rechner oder auf einem anderen Docker-Host laufen. Anmeldung, Werkzeuge und Projektdateien bleiben auf dem Codex-Host.
 
@@ -59,7 +59,7 @@ Das Zahnrad öffnet Sprache, Enter-Belegung, Behandlung von Folgenachrichten und
 
 ## Dokumentation und Entwicklung
 
-Die [Dokumentation](docs/wiki/Home.md) beginnt mit einer Sprachauswahl. Sie behandelt Einrichtung, Benutzung, Fehlerbehebung, Architektur, APIs, Datenhaltung und Techstack. Alle Seiten sind direkt im Repository auf Deutsch und Englisch verfügbar.
+Das [Wiki](https://github.com/Tweak90/codex-web/wiki) beginnt mit einer Sprachauswahl. Es behandelt Einrichtung, Benutzung, Fehlerbehebung, Architektur, APIs, Datenhaltung und Techstack. Alle Seiten sind auch [direkt im Repository](docs/wiki/Home.md) auf Deutsch und Englisch verfügbar.
 
 ```bash
 npm ci

@@ -15,5 +15,5 @@ First release of the independent Codex-Web browser interface.
 - Usage limits, reset confirmation, context usage, project defaults, task overview and optional notifications.
 - Project tabs return to the last open chat; a different project initially shows a chat list.
 - Docker-console and Compose setup, persistent volumes, bilingual Wiki sources and maintenance guides.
-
+- Published bilingual GitHub Wiki with a language chooser, logo and direct installation, usage and technical documentation links.
 - Neutral Git metadata without author email addresses; published images omit build-event provenance.

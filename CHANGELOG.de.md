@@ -15,5 +15,5 @@ Erste Veröffentlichung der eigenständigen Codex-Web-Oberfläche.
 - Kontingente mit bestätigten Rücksetzungen, Kontext, Projektvorgaben, Aufgaben und optionale Hinweise.
 - Reiter kehren im selben Projekt zum geöffneten Chat zurück; ein anderes Projekt zeigt zunächst seine Chatliste.
 - Docker-/Compose-Anleitung, persistente Volumes, zweisprachige Wiki-Quellen und Entwicklerdokumentation.
-
+- Veröffentlichtes zweisprachiges GitHub-Wiki mit Sprachauswahl, Logo und direkten Links zu Installation, Benutzung und technischen Details.
 - Neutrale Git-Metadaten ohne Autoren-E-Mail-Adressen; Images enthalten keine Build-Ereignis-Provenienz.
