@@ -6,6 +6,7 @@
 
 - Settings gear restored below the 5-hour and weekly percentages in the narrow activity bar.
 - Removed Settings and Usage limits entries from the wide project sidebar. Both remain accessible as compact menu icons on mobile.
+- Attachments wait for an in-progress chat creation, preventing uploads from being assigned to a missing chat.
 
 ## 1.0.1 — 2026-11-05
 

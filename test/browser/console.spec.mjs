@@ -937,13 +937,38 @@ test("image clipboard and file uploads reach chat input; explorer creates, moves
     "Isolated upload fixture only.",
   );
   await login(page);
+  // A project is visible before its initial chat is ready. Attach during that
+  // interval, then return the upload after chat creation to exercise the race.
+  let releaseChat, releaseUpload;
+  const chatReady = new Promise((resolve) => { releaseChat = resolve; });
+  const uploadReady = new Promise((resolve) => { releaseUpload = resolve; });
+  const chatRoute = /\/api\/projects\/[^/]+\/chats$/;
+  const uploadRoute = /\/api\/projects\/[^/]+\/uploads\?/;
+  await page.route(chatRoute, async (route) => {
+    const response = await route.fetch();
+    await chatReady;
+    await route.fulfill({ response });
+  });
+  await page.route(uploadRoute, async (route) => {
+    const response = await route.fetch();
+    await uploadReady;
+    await route.fulfill({ response });
+  });
   const p = await createProject(page);
+  await expect(page.locator("#prompt")).toBeDisabled();
   await page.locator("#attachment-picker").setInputFiles({
     name: "notizen.txt",
     mimeType: "text/plain",
     buffer: Buffer.from("Lokale Notizen"),
   });
+  await page.evaluate(() => new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  releaseChat();
+  await expect(page.locator("#prompt")).toBeEnabled();
+  releaseUpload();
   await expect(page.locator(".attachment-chip")).toHaveCount(1);
+  await page.unroute(chatRoute);
+  await page.unroute(uploadRoute);
   const png =
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6XcAAAAASUVORK5CYII=";
   await page.locator("#prompt").evaluate((element, data) => {

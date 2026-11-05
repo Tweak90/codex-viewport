@@ -23,6 +23,8 @@ Codex-Web ist eine selbstgehostete Oberfläche für einen vorhandenen Codex App 
 
 Standardmäßig fügt **Enter einen Zeilenumbruch** ein und **Shift+Enter sendet**. Diese Belegung lässt sich umkehren. Der Chat-Reiter zeigt die Chatliste; nach einem Reiterwechsel im selben Projekt kehrt er zum geöffneten Chat zurück.
 
+Während der Erstellung eines neuen Chats gewählte Anhänge warten auf diesen Chat und bleiben ihm zugeordnet.
+
 ## Voraussetzungen
 
 Ein angemeldeter, laufender Codex App Server (verifiziert mit **0.166.0**), Docker auf dem Web-Host und Netzwerkzugang zur Codex-API. Für die Projekt- und Dateiwerkzeuge werden Python 3 und Git auf dem Codex-Host benötigt.

@@ -399,7 +399,7 @@ function clearChat(view) {
   $("sidebar").classList.remove("open");
 }
 async function newChat(projectId) {
-  if (state.creatingChat) return;
+  if (state.creatingChat) return state.creatingChat.promise;
   if (state.pendingSend) return toast(I18N.t("Der Auftrag wird gerade übermittelt."));
   const project =
     typeof projectId === "string"
@@ -416,19 +416,23 @@ async function newChat(projectId) {
   const creation = { version: state.openVersion };
   state.creatingChat = creation;
   updateComposer();
-  try {
-    const result = await api(
-      `/api/projects/${encodeURIComponent(project.id)}/chats`,
-      {},
-    );
-    projectSnapshot(result);
-    if (creation.version !== state.openVersion) return;
-    await openThread(result.thread.id);
-  } finally {
-    if (state.creatingChat === creation) state.creatingChat = null;
-    updateComposer();
-    $("prompt").focus();
-  }
+  creation.promise = (async () => {
+    try {
+      const result = await api(
+        `/api/projects/${encodeURIComponent(project.id)}/chats`,
+        {},
+      );
+      projectSnapshot(result);
+      if (creation.version === state.openVersion)
+        await openThread(result.thread.id);
+      return result.thread;
+    } finally {
+      if (state.creatingChat === creation) state.creatingChat = null;
+      updateComposer();
+      $("prompt").focus();
+    }
+  })();
+  return creation.promise;
 }
 async function openThread(id, options = {}) {
   if (state.pendingSend) return toast(I18N.t("Der Auftrag wird gerade übermittelt."));

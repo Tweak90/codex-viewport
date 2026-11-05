@@ -209,9 +209,15 @@ ${I18N.t("Pfad auf der KI-VM:")} ${file.path}`,
     async upload(files, directory = null) {
       const project = selectedProject();
       if (!project) return toast(I18N.t("Wähle zuerst ein Projekt."));
-      if (!directory && !state.thread) await newChat(project.id);
-      const key = F.currentKey;
       const list = [...files];
+      if (!list.length) return;
+      let chat = state.thread;
+      if (!directory) {
+        if (state.creatingChat) chat = await state.creatingChat.promise;
+        else if (!chat) chat = await newChat(project.id);
+        if (!chat?.id) return;
+      }
+      const key = chat?.id;
       if (!directory && list.length + F.attachments.length > 20)
         return toast(I18N.t("Maximal 20 Anhänge je Nachricht."));
       F.uploading += list.length;

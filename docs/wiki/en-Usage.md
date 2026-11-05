@@ -13,7 +13,7 @@ The wide sidebar contains projects, archive, questions and chat search. Usage li
 
 Switching between Overview, Images, Agents and Chat returns you to the same open chat. Selecting another project clears that return target and shows its chat list first. Navigation does not create a chat.
 
-The top bar contains context usage, theme switching and sign-out. Files, read-only Git and terminal are in the tool panel; mobile devices also have the workspace menu. The gear button opens settings, with access to notifications and version information.
+The top bar contains context usage, theme switching and sign-out. Files, read-only Git and terminal are in the tool panel; mobile devices also have the workspace menu. The gear button opens settings. Info is available from Settings and the version indicator.
 
 ## Projects
 
@@ -60,6 +60,8 @@ Async answers retain their original call ID and question index. An unconfirmed d
 
 Attach files with the paperclip, drag-and-drop or image paste. Limits are 20 attachments per message and 25 MB per file. Images use native image input; other files are referenced by their path on the Codex host. Removing an attachment from a message does not delete the uploaded file.
 
+Attachments selected while a new chat is being created wait for that chat and stay assigned to it, including if you navigate elsewhere during the upload.
+
 Uploaded images appear directly without a visible `[Image]` placeholder. The explorer can create, rename, move, download and permanently delete files and folders. Deletion requires confirming the name; the editor checks for intervening changes before saving. Folder downloads are ZIP archives; see [limits](en-Security-and-limitations.md).
 
 ## Gallery and archive
@@ -74,7 +76,7 @@ Archived chats can be read, bulk-restored or permanently deleted. Reading does n
 
 Full-text search covers messages and activities, including archived chats, with an optional project filter. Initial indexing runs in the background. A result opens and highlights its history location.
 
-**Tasks** shows running and recently updated chats, status, duration, errors and stop controls. Optional notices and sound work while the web UI is open.
+**Tasks** shows running and recently updated chats, status, duration, errors and stop controls.
 
 **Usage limits** shows account data and reset credits returned by Codex. A reset requires confirmation. The context indicator shows chat tokens and observed compactions; it is separate from account usage limits.
 

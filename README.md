@@ -23,6 +23,8 @@ Codex-Web connects to an existing Codex App Server. The web container connects e
 
 By default, **Enter inserts a newline** and **Shift+Enter sends**. You can reverse this in Settings. The Chat tab lists project chats and returns to your open chat when switching tabs within a project.
 
+Attachments selected while a new chat is being created wait for that chat and stay assigned to it.
+
 ## Requirements
 
 - A running, signed-in Codex App Server; verified with **Codex 0.166.0**.

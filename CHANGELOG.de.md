@@ -6,6 +6,7 @@
 
 - Einstellungszahnrad unter den 5-Stunden- und Wochen-Prozentwerten der schmalen Aktivitätsleiste wiederhergestellt.
 - Einstellungen und Kontingente aus der breiten Projektseitenleiste entfernt. Auf Mobilgeräten bleiben beide als kompakte Menüsymbole erreichbar.
+- Anhänge warten auf eine laufende Chat-Erstellung, damit Uploads zuverlässig dem neuen Chat zugeordnet werden.
 
 ## 1.0.1 — 2026-11-05
 

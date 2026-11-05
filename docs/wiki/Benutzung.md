@@ -4,11 +4,12 @@
 
 ## Oberfläche
 
-Die Seitenleiste enthält Projekte, Archiv, Kontingente und die Chatsuche. **Neuer Chat** steht unter der Chatsuche. In der Mitte wechseln die Reiter **Übersicht**, **Chat** und **Bilder** die Projektansicht.
+Die breite Seitenleiste enthält Projekte, Archiv, Rückfragen und die Chatsuche. Kontingente und Einstellungen stehen als Symbole in der schmalen Aktivitätsleiste. **Neuer Chat** steht unter der Chatsuche. In der Mitte wechseln die Reiter **Übersicht**, **Chat**, **Bilder** und **Agents** die Projektansicht.
 
 - **Übersicht**: Projektinformationen, Chatliste und Bildvorschau.
 - **Chat**: Chatliste mit **Neuen Chat starten** oberhalb der vorhandenen Chats. Der Reiter legt keinen Chat an. Beim Wechsel zwischen Übersicht, Bildern und Chat innerhalb desselben Projekts kehrt er zum zuletzt geöffneten Chat zurück. Ein Projektwechsel setzt diese Rückkehr zurück.
 - **Bilder**: Galerie des ausgewählten Projekts.
+- **Agents**: Unteragenten dieses Projekts, einschließlich archivierter Verläufe.
 
 Die obere Aktionsleiste bietet Kontext, Darstellungswechsel und Abmelden. Dateien, lesende Git-Ansicht und Konsole sind in der Werkzeugleiste erreichbar; auf Mobilgeräten im aufklappbaren Seitenmenü. Das Zahnrad unter den Kontingent-Prozentwerten der schmalen Aktivitätsleiste öffnet **Einstellungen** mit Sprache, Eingabeverhalten und Anwendungskonfiguration. Der Info-Dialog mit Versionsinformationen ist von dort sowie über die Versionsanzeige erreichbar.
 
@@ -51,6 +52,8 @@ Rechtsklick oder **⋯** öffnet Chataktionen wie Umbenennen, Projektzuordnung, 
 
 Die Büroklammer, Drag-and-drop oder Bild-Paste laden Anhänge in das Projekt. Höchstens 20 Anhänge je Nachricht und 25 MB je Datei. Bilder werden als native Bildeingabe übergeben, andere Dateien mit ihrem Pfad auf dem Codex-Host. Das Entfernen eines Anhangs aus der Nachricht löscht die hochgeladene Datei nicht.
 
+Während der Erstellung eines neuen Chats gewählte Anhänge warten auf diesen Chat und bleiben ihm auch bei einem Ansichtswechsel während des Uploads zugeordnet.
+
 Im Dateiexplorer lassen sich Dateien und Ordner erstellen, umbenennen, verschieben, herunterladen und nach Namensbestätigung endgültig löschen. Der Editor prüft beim Speichern auf zwischenzeitliche Änderungen. Ordnerdownloads werden als ZIP erzeugt; Grenzen stehen unter [Sicherheit und Grenzen](Sicherheit-und-Grenzen.md).
 
 ## Bilder und Archiv
@@ -63,7 +66,7 @@ Im Archiv lassen sich Chats lesen, gesammelt wiederherstellen oder endgültig l�
 
 Die Volltextsuche erfasst Nachrichten und Aktivitäten einschließlich Archiv, wahlweise mit Projektfilter. Die erste Indexierung läuft im Hintergrund. Ein Treffer öffnet und markiert die passende Verlaufsstelle.
 
-**Aufgaben** zeigt laufende und zuletzt bearbeitete Chats mit Status, Laufzeit, Fehlern und Stoppen. Optionale Hinweise und Ton gelten bei geöffneter Oberfläche.
+**Aufgaben** zeigt laufende und zuletzt bearbeitete Chats mit Status, Laufzeit, Fehlern und Stoppen.
 
 **Kontingente** zeigt die von Codex gelieferten Nutzungsfenster und verfügbaren Rücksetzungen. Eine Rücksetzung wird nur nach ausdrücklicher Bestätigung angefordert. Die Kontextanzeige beschreibt dagegen Tokens im Chatkontext und beobachtete Komprimierungen; sie ist kein Kontingentmesser.
 
