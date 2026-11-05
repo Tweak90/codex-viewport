@@ -8,7 +8,7 @@
 
 The browser password protects control APIs, images and events. It is stored as a salted scrypt hash. Sessions use random tickets whose hashes are stored server-side. Mutating browser requests require a CSRF token and pass origin checks.
 
-The gateway has a separate optional bearer token, required by `compose.image.yml`. It is independent of the browser session. Saved API/GitHub tokens stay in the protected data volume and are never returned by settings endpoints. Anyone with the shared web password can edit instance settings.
+The external Codex API may require a separate bearer token. It is independent of the browser session. Saved API/GitHub tokens stay in the protected data volume and are never returned by settings endpoints. Anyone with the shared web password can edit instance settings.
 
 The interface can run Codex tasks and host tools. Codex permissions and approvals still apply; management commands have real filesystem effects on the host. Password and path checks do not create another isolated VM. Configure network access, TLS and endpoint access for your environment.
 

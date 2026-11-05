@@ -2,61 +2,60 @@
 
 [Deutsch](Konfiguration.md) · [English home](en-Home.md)
 
-`.env.example` contains neutral examples. A local `.env` is not tracked. Docker reads an environment file with `--env-file`; Compose reads `.env` for the chosen role.
+The web container connects exclusively to an external Codex API over WebSocket. `.env.example` contains neutral examples. For Docker, use `--env-file`; Compose reads `.env`.
 
-## Web application
+## Application variables
 
 | Variable | Purpose | Default |
 | --- | --- | --- |
-| `CODEX_WS_URL` | WebSocket endpoint on the Codex host | Required by Docker configurations |
-| `CODEX_API_TOKEN` | Bearer token for the gateway or compatible endpoint | Required by `compose.image.yml` |
-| `HOST_LABEL` | Host name displayed in the UI | `KI-VM` |
+| `CODEX_WS_URL` | External Codex API address, starting with `ws://` or `wss://` | Empty; set in ENV or Settings to connect |
+| `CODEX_API_TOKEN` | Bearer token if required by that API | Empty |
+| `HOST_LABEL` | Codex host name displayed in the UI | `Codex-Host` |
 | `CODEX_PROJECTS_ROOT` | Base directory for new projects on the Codex host | Derived from Codex metadata, ending in `codex-projects` |
-| `CODEX_WEB_LANGUAGE` | Language without a saved override | `de`; alternatively `en` |
+| `CODEX_WEB_LANGUAGE` | Language without a saved override | `en`; alternatively `de` |
 | `CODEX_SEND_WITH` | Send key without a saved override | `shiftEnter`; alternatively `enter` |
-| `CODEX_FOLLOWUP_MODE` | Handling of follow-ups while a task is active | `steer`; alternatively `queue` |
-| `CODEX_WEB_IMAGE` | Image used by `compose.image.yml` | `ghcr.io/tweak90/codex-web-ui:latest` |
-| `CODEX_RELEASE_REPOSITORY` | Repository for release notifications | This project; use `owner/repo` |
-| `CODEX_GITHUB_TOKEN` | Optional read-only token for release checks | Otherwise use `gh` on the Codex host |
+| `CODEX_FOLLOWUP_MODE` | Follow-ups during active work | `steer`; alternatively `queue` |
+| `CODEX_RELEASE_REPOSITORY` | Release notification repository in `owner/repo` format | This project |
+| `CODEX_GITHUB_TOKEN` | Optional read-only token for release checks | Empty; public releases are checked anonymously |
 
-`CODEX_API_TOKEN` protects the Codex connection. It is independent of the browser password and is not an OpenAI API key.
+`CODEX_API_TOKEN` is independent of the browser password and is not an OpenAI API key. Project paths refer to the Codex host and are accessed through the API.
 
-## Gear menu and precedence
+## Settings and ENV precedence
 
-The gear button opens settings shared by this web instance. Overrides persist in `settings.json` in the data volume.
+**Settings** is in the left sidebar directly above **Usage limits**. The dialog has three categories:
 
-- **Empty field / Use ENV:** use the environment value, or the documented default if ENV is absent.
+- **General settings:** language, send shortcut and follow-up behavior.
+- **Codex settings:** display name, API endpoint and token, and project base directory.
+- **Updates:** release repository, optional GitHub token and the Info dialog.
+
+Each field shows whether it uses a custom value, ENV or a default. Expand **ENV details** for the variable name and fallback value. Changes survive category switches; **Save** and **Cancel** remain visible.
+
+- **Empty field / Use default:** use the environment value, or the documented default when ENV is absent.
 - **Filled field:** the saved setting takes precedence over ENV.
-- Secret values are never sent back to the browser. An existing secret shown as active stays unchanged until edited. **Use ENV** removes that saved override; a new value replaces it.
+- Secret values are never returned to the browser. An existing saved secret stays unchanged until edited. **Use default** explicitly removes that override.
 
-Settings cover language, Enter behavior, follow-up handling, host label, API address and token, local control socket, project base directory and GitHub release access.
+Overrides persist in `settings.json` in the data volume. Unsupported settings left by earlier installations are removed at startup; current preferences are preserved. Connection changes reconnect the bridge and are rejected while API calls are pending. Sent work is never replayed. A different Codex host may have different absolute project paths.
 
-Host label, project base directory and release access changes apply immediately. A changed Codex endpoint reconnects the bridge; connection changes are rejected while API calls are pending. Previously sent work is never replayed. A different Codex host may use different absolute project paths.
+## Docker and Node startup
 
-## Docker and gateway parameters
-
-These settings belong to container creation rather than the application settings menu:
-
-| Variable | Purpose | Default or example |
+| Variable | Purpose | Default |
 | --- | --- | --- |
-| `WEB_BIND_IP` / `WEB_PORT` | Published browser address and port | `0.0.0.0` / `8787` |
-| `API_BIND_IP` / `API_PORT` | Published gateway address and port | `0.0.0.0` / `4500` |
-| `CODEX_SOCKET_DIR` | Control-socket directory | `${HOME}/.codex/app-server-control` |
-| `CODEX_RUNTIME_SOCKET_DIR` | Actual socket target directory | `/tmp/codex-daemon-1000` |
-| `CODEX_UID` / `CODEX_GID` | Gateway user and group | `1000` / `1000`; match your installation |
+| `WEB_BIND_IP` / `WEB_PORT` | Published Docker browser address and port | `0.0.0.0` / `8787` |
+| `CODEX_WEB_IMAGE` | Image used by `compose.image.yml` | `ghcr.io/tweak90/codex-web-ui:latest` |
+| `DATA_DIR` | Web data directory for direct Node startup | `.data`; `/data` in Docker |
+| `PORT` / `BIND_ADDRESS` | Node HTTP listener | `8787` / `0.0.0.0` |
 
-The gateway only needs the control socket. It receives no project directories or Docker socket. The web UI does not manage containers or deploy updates.
-
-## Direct Node startup
-
-`npm start` also accepts `CODEX_SOCKET`, `DATA_DIR`, `PORT` and `BIND_ADDRESS`. The Docker image stores web data under `/data` and listens internally on port `8787`. Docker ports, mounts and process bind settings are configured at startup.
+Ports, volumes and image selection belong to Docker/Compose configuration. The settings dialog does not manage containers or deploy updates.
 
 ## Browser password and reverse proxy
 
-Set the password in the UI; there is no password default in `.env`. Keep the data volume to preserve sign-in and settings during updates.
+Set the password in the UI; there is no password default in ENV. Retain the data volume to preserve sign-in and settings across updates.
 
-A reverse proxy must support WebSocket upgrades for `/events` and for any proxied gateway. Allow long-lived connections and forward `Host`, `X-Forwarded-Host` where needed, and `X-Forwarded-Proto` correctly; these affect origin checks and cookie security.
 
-Desktop notifications require HTTPS or localhost and browser permission. In-app notices do not require desktop notification support.
+## Defaults and Info
 
-The Codex account sign-in stays on the Codex host. The browser password, gateway token, optional GitHub token and any Git credentials serve separate purposes.
+When ENV and saved overrides are absent, the interface uses English, Shift+Enter for sending, steer for follow-ups, `Codex-Host` for its display name and this project's repository for releases. The project base directory is derived from Codex metadata; credentials are empty. The API address must be supplied in ENV or Settings. Compose can start the web UI before that address is configured; the connection stays offline until an endpoint is saved.
+
+Configured environment values are marked **From environment**. **Custom value** indicates a saved override, while **Use default** clears it. Expanded ENV details show the underlying fallback. An existing language override is retained during updates.
+
+**Info** contains the installed version and a read-only GitHub release check, with latest version and publication date. Public checks use no authentication and need no Codex-host command or Docker access. Cached results reduce repeated requests; **Check for updates** forces a new lookup. A token is optional for private repositories or a higher GitHub request limit.

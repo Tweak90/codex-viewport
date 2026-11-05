@@ -1,21 +1,21 @@
 name: codex-console
 services:
   web:
-    image: codex-vm-console:1.0.0
+    image: codex-vm-console:1.0.1
     build: .
     restart: unless-stopped
     init: true
     ports:
       - "${WEB_BIND_IP:-0.0.0.0}:${WEB_PORT:-8787}:8787"
     environment:
-      CODEX_WS_URL: ${CODEX_WS_URL:?Set CODEX_WS_URL to the Codex host WebSocket URL}
+      CODEX_WS_URL: ${CODEX_WS_URL:-}
       CODEX_API_TOKEN: ${CODEX_API_TOKEN:-}
       CODEX_GITHUB_TOKEN: ${CODEX_GITHUB_TOKEN:-}
       CODEX_RELEASE_REPOSITORY: ${CODEX_RELEASE_REPOSITORY:-}
-      CODEX_WEB_LANGUAGE: ${CODEX_WEB_LANGUAGE:-de}
-      CODEX_FOLLOWUP_MODE: ${CODEX_FOLLOWUP_MODE:-steer}
-      CODEX_SEND_WITH: ${CODEX_SEND_WITH:-shiftEnter}
-      HOST_LABEL: ${HOST_LABEL:-KI-VM}
+      CODEX_WEB_LANGUAGE: ${CODEX_WEB_LANGUAGE:-}
+      CODEX_FOLLOWUP_MODE: ${CODEX_FOLLOWUP_MODE:-}
+      CODEX_SEND_WITH: ${CODEX_SEND_WITH:-}
+      HOST_LABEL: ${HOST_LABEL:-}
       CODEX_PROJECTS_ROOT: ${CODEX_PROJECTS_ROOT:-}
     volumes:
       - console-data:/data

@@ -1,15 +1,13 @@
 # Logo
 
-The independent Codex-Web mark was generated entirely with AI.
+The selected Codex-Web mark is an original AI-generated blue browser/terminal frame with a cyan cursor. Its PNG alpha channel keeps the background transparent in both light and dark themes.
 
-The mark combines two code brackets and a connecting bridge, using the interface's mint accent color. The final asset is `public/assets/logo.png`, used in the app, favicon and README.
+`public/assets/logo.png` is the shared asset for sign-in, the sidebar, chat avatars, browser notifications, favicon, README and Wiki. Interface references use an asset revision query to refresh cached copies after the logo change. No colored background tile or theme-specific frame is added.
 
-It was generated and revised with the built-in image generation tool. Original generation output stays outside the repository; the final project asset is included below. No third-party UI asset was copied.
+## Generation
 
-## Generation prompt
+Created with the built-in image generation tool. The selected PNG is included in the repository; no third-party client assets were copied.
 
-Use case: logo-brand. Asset type: original app icon and repository logo for an independent self-hosted developer tool called Codex-Web. Create a single distinctive symbol, without any text: a confident, minimal geometric mark combining a pair of code angle brackets with a small connecting bridge, suggesting a browser controlling a remote machine. A compact, balanced angular ribbon silhouette with softened corners, substantial consistent strokes, and generous negative space. Professional Swiss graphic design, clean flat vector-like shapes, crisp edges, recognizable at 32 pixels. Palette: pale mint green #B9EDBD, with subtle forest green #466B52 only if essential to separate the interlocking shapes. Composition: one centered symbol filling about 78% of a square canvas. Genuinely transparent background with clean alpha, no card, no frame, no mockup, no shadows, no glow, no 3D, no gradients, no letters or wordmark, no OpenAI knot or any existing logo. This is the final usable logo asset, not a sheet of concepts.
+## Prompt
 
-## Revision prompt
-
-Edit this logo into clean flat production logo artwork. Preserve the exact interlocking left/right angle-bracket and horizontal bridge silhouette and its placement. Use only two perfectly solid flat colors: #B9EDBD for the front ribbon and #466B52 for the two small overlapping rear segments. Eliminate EVERY gradient, bevel, highlight, 3D effect, glow, shadow, haze, cloudy alpha and soft translucent area. Outside the symbol the alpha must be exactly zero; inside the solid shape alpha must be fully opaque, with only narrow antialiasing at the crisp edges. Make this look like a flat vector logo exported as a transparent PNG. No text, no additional elements. Transparent background.
+Use case: logo-brand. Asset type: original application logo proposal for Codex-Web, an independent self-hosted browser interface for remote Codex projects and chats. Create one polished, distinctive mark only, square composition, centered, generous transparent margin, genuinely transparent background. Flat vector-like shapes, precise geometry, professional developer-tool identity, readable as a small app icon. No mockup, no sheet of options, no background tile, no caption, no watermark, no OpenAI knot, no existing product logos. Direction 1 — CONSOLE: an expressive compact terminal prompt symbol integrated into an open browser-window corner. Create a strong original silhouette with an angular prompt and a short cursor, clean negative space and slightly softened corners. Restrained cool blue with a small cyan accent. Avoid interlocking chevrons and ribbon forms. No text.

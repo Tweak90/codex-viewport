@@ -4,29 +4,20 @@
 
 ## Web UI works but Codex is offline
 
-1. Check `CODEX_WS_URL`: use a `ws://` or `wss://` endpoint, not a filesystem path.
-2. Check connectivity from the web container to the Codex API port.
-3. Compare `CODEX_API_TOKEN` on both hosts without copying it into logs or issue reports.
-4. Check the daemon and socket on the Codex host:
+1. Set `CODEX_WS_URL` to the external API's `ws://` or `wss://` address.
+2. Check DNS, routing, firewall access and the API port from the web container.
+3. If authentication is required, verify `CODEX_API_TOKEN` against that API's configuration.
+4. Check whether the external App Server is running and whether a proxy forwards WebSocket upgrades. For `wss://`, check its certificate and hostname.
 
-```bash
-codex app-server daemon version
-readlink -f "$HOME/.codex/app-server-control/app-server-control.sock"
-```
-
-A healthy gateway can still have an inaccessible Codex socket. The signed-in web UI shows the actual Codex connection state.
-
-## Missing socket or permission denied
-
-Match `CODEX_SOCKET_DIR` to the directory containing the control socket. For an absolute symlink, also configure `CODEX_RUNTIME_SOCKET_DIR` for its real target. Gateway UID/GID must match socket permissions. Missing bind-mount directories are not created automatically.
+The signed-in UI shows the actual API connection state. A healthy web container alone does not prove that its external API is reachable.
 
 ## Settings appear to ignore ENV
 
-A saved, nonempty setting overrides ENV. Open the gear menu, clear the field or use **Use ENV**, then save. Existing secrets stay unchanged when not edited; the reset button explicitly removes their stored override. Docker ports and volume mounts are deployment settings and do not change through this menu.
+A saved, nonempty setting overrides ENV. Open the gear menu, clear the field or use **Use default**, then save. Existing secrets stay unchanged when not edited; the reset button explicitly removes their stored override. Docker ports and volume mounts are deployment settings and do not change through this menu.
 
 ## Sign-in problems
 
-Set a password on first launch. Keep the same persistent data volume across updates. Reload the page or sign in again if the browser session is stale. The browser password is independent of the Codex account and gateway token. Deleting the volume resets more than the password and is not an update procedure.
+Set a password on first launch. Keep the same persistent data volume across updates. Reload the page or sign in again if the browser session is stale. The browser password is independent of the Codex account and API token. Deleting the volume resets more than the password and is not an update procedure.
 
 ## Project cannot be created
 
@@ -50,14 +41,17 @@ The gallery groups byte-identical files by SHA-256. Visually similar files with 
 
 The queue is native to Codex and is shown above the composer. Automatic advancement pauses after a failed or interrupted task. Starting a new task resumes normal processing. Entries owned by another client remain under that client's control. An unconfirmed queue-start operation is not repeated automatically.
 
-## Usage limits, context or notifications are missing
+## Usage limits or context are missing
 
 Only values supplied by the App Server are displayed. Check browser sign-in, API connection and Codex account state; missing values are not replaced by guessed limits. Context values come from token events or saved native history.
 
-Desktop notifications require HTTPS or localhost, permission in the browser and enabled notices in settings. Keep the UI open. Sound needs a user interaction; in-app notices do not require desktop notification support.
 
 ## Release check or proxy connections fail
 
-Release checks need an authenticated `gh` on the Codex host or a read-only `CODEX_GITHUB_TOKEN`. For forks, set `CODEX_RELEASE_REPOSITORY`. This only reads metadata and does not pull images.
+Release checks use anonymous HTTPS requests from the web container to GitHub by default. An optional read-only `CODEX_GITHUB_TOKEN` supports private repositories or a higher request limit. For forks, set `CODEX_RELEASE_REPOSITORY`. This only reads metadata and does not pull images.
 
 For a reverse proxy, check WebSocket upgrades, forwarded host/protocol headers and timeouts. Connections reconnect, but previously sent mutations are never replayed. Inspect history before manually repeating work whose outcome is unclear.
+
+## Agent list is empty
+
+Agents are native subagent threads whose working directory matches the selected project. Select the correct project, clear search/status filters and load more entries. Deleted or never-persisted agent histories cannot be reconstructed. **Not loaded** describes native runtime state rather than a completion result.

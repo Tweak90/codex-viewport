@@ -2,116 +2,71 @@
 
 [Deutsch](Installation.md) · [English home](en-Home.md)
 
-There are two roles: the Codex host and the web host. They can run on one machine or separate machines. The web server must reach the Codex host's API endpoint.
+Codex-Web is a Docker web client for an **existing external Codex App Server API**. It connects exclusively over `ws://` or `wss://`. Codex sign-in, project files and tools stay on the Codex host. Install this project on the web host; it does not start or bundle a Codex process.
 
 ## Requirements
 
-| Location | Requirement |
-| --- | --- |
-| Codex host | Running, signed-in Codex App Server; verified with Codex 0.166.0 |
-| Codex host | Python 3 and Git for project, file and terminal tools |
-| Web host | Docker; the published image targets Linux/amd64 |
-| Gateway host | Docker and Compose when using the included gateway |
-| Network | Web host can reach the Codex API port, normally TCP 4500 |
-| Local development | Node.js 22 or newer and npm |
+- Docker on the web host; Compose is optional.
+- A reachable Codex App Server WebSocket endpoint, verified with Codex **0.166.0**. See the [official App Server documentation](https://learn.chatgpt.com/docs/app-server) for the server's setup.
+- Its bearer token if the API requires authentication.
+- Python 3 and Git on the Codex host for project and file tools. These tools are invoked through the API.
 
-Replace `.example` hostnames, IDs and paths with values for your installation.
+Project directories and Codex sign-in data do not need to be mounted into the web container. The container only needs its own persistent data volume and network access to the API.
 
-## 1. Provide the Codex API
-
-Configure Codex with the account you want to use. Codex-Web reuses that existing sign-in; the web container does not install or launch another Codex process.
-
-If you already have a compatible WebSocket endpoint, skip to the web container and point `CODEX_WS_URL` at it. Authentication and TLS follow that endpoint's configuration.
-
-Otherwise, check out the project on the Codex host and configure the gateway:
-
-```bash
-git clone https://github.com/Tweak90/codex-web.git
-cd codex-web
-cp .env.example .env
-codex app-server daemon start
-codex app-server daemon version
-readlink -f "$HOME/.codex/app-server-control/app-server-control.sock"
-```
-
-Set these gateway values in `.env`:
-
-```dotenv
-API_BIND_IP=0.0.0.0
-API_PORT=4500
-CODEX_SOCKET_DIR=${HOME}/.codex/app-server-control
-CODEX_RUNTIME_SOCKET_DIR=/tmp/codex-daemon-1000
-CODEX_UID=1000
-CODEX_GID=1000
-CODEX_API_TOKEN=replace-with-your-gateway-token
-```
-
-`CODEX_SOCKET_DIR` contains `app-server-control.sock`. If this socket is an absolute symlink, also mount its actual target directory as `CODEX_RUNTIME_SOCKET_DIR`. The runtime directory and UID/GID shown above are examples; match them to the Codex user.
-
-Use your own bearer token and the same value on the web host. Do not commit the token.
-
-```bash
-docker compose -f compose.gateway.yml up -d --build
-```
-
-Alternatively, `bash scripts/start-api.sh` starts the daemon and builds the gateway. The gateway forwards to the existing socket and does not replace the daemon. Its health check only checks the gateway HTTP server.
-
-See the [official App Server documentation](https://learn.chatgpt.com/docs/app-server) for the protocol and supported transports.
-
-## 2. Run the published image using Docker
-
-The published image needs no source checkout or local build. Public packages need no registry login. For restricted packages, first run `docker login ghcr.io` with an account that has read access.
+## Start the published image with Docker
 
 Create `.env.web` on the web host:
 
 ```dotenv
 CODEX_WS_URL=ws://codex-host.example:4500
-CODEX_API_TOKEN=replace-with-your-gateway-token
+CODEX_API_TOKEN=replace-with-your-api-token
 HOST_LABEL=Codex-Host
 ```
 
-Use `wss://` when connecting through a TLS proxy. Replace the hostname and token, then run:
+Replace the example host and token with your API endpoint's values. Leave `CODEX_API_TOKEN` empty if that endpoint does not require a token.
 
 ```bash
 docker volume create codex-web-data
 docker pull ghcr.io/tweak90/codex-web-ui:latest
 docker run -d --name codex-web --restart unless-stopped --init \
-  -p 8787:8787 \
-  --env-file .env.web \
+  -p 8787:8787 --env-file .env.web \
   -v codex-web-data:/data \
   ghcr.io/tweak90/codex-web-ui:latest
 ```
 
-Open `http://web-host.example:8787`. Set and confirm a password of at least four characters. There is no default password. Keep the data volume for future updates.
+The public image supports Linux/amd64 and requires no registry sign-in, source checkout or local build. For a restricted fork's image, first use `docker login` with an account that has read access.
 
-## Published image with Compose
+Open `http://web-host.example:8787` and set a browser password of at least four characters. The browser password is independent of the Codex account and API token. Keep the data volume for future updates.
 
-After checking out the repository, copy `.env.example` to `.env` and enter the web API values:
+## Use Compose
 
-```bash
-docker compose -f compose.image.yml pull
-docker compose -f compose.image.yml up -d
-```
-
-`compose.image.yml` uses the published image and does not build source code. `CODEX_WEB_IMAGE` can select a fixed version or your own image. `latest` follows the current release; a fixed tag allows an explicit version choice. Other container management tools must use equivalent image, environment, port and volume settings.
-
-## Build from source
+Check out the source on the web host:
 
 ```bash
 git clone https://github.com/Tweak90/codex-web.git
 cd codex-web
 cp .env.example .env
-# Enter your Codex API address and token in .env.
+```
+
+Set `CODEX_WS_URL` and, if required, `CODEX_API_TOKEN` in `.env`. Then use the published image:
+
+```bash
+docker compose -f compose.image.yml up -d
+```
+
+Or build the web image from source:
+
+```bash
 docker compose up -d --build
 ```
 
-Alternatively, use `bash scripts/start-web.sh`.
+Both configurations connect to the external API. Both retain web data in `console-data` at `/data`.
 
-## Local development
+## Run Node directly for development
 
 ```bash
 npm ci
-CODEX_SOCKET="$HOME/.codex/app-server-control/app-server-control.sock" npm start
+CODEX_WS_URL=ws://codex-host.example:4500 npm start
 ```
 
-Without `CODEX_WS_URL`, the Node server uses the local Unix control socket. Docker web configurations explicitly require a WebSocket URL. Continue with [Configuration](en-Configuration.md) and [Usage](en-Usage.md).
+Provide `CODEX_API_TOKEN` through your environment if required. `CODEX_WS_URL` or a saved API address is required; no local connection is selected automatically. Continue with [Configuration](en-Configuration.md), [Usage](en-Usage.md) and [Updates](en-Operations-and-updates.md).

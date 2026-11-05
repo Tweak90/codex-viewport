@@ -383,10 +383,15 @@ test("quota dialog renders its full shell immediately, then fills values without
     "false",
   );
   await expect(page.locator("#info-content")).toContainText("75% verfügbar");
+  await expect(page.locator("#activity-usage-primary")).toHaveText("75%");
+  await expect(page.locator("#activity-usage-weekly")).toHaveText("90%");
   await expect(page.locator("#reset-count")).toHaveText("2");
   await expect(page.locator("#info-content")).not.toContainText("hasCredits");
   await page.locator("#usage-refresh").click();
   await expect(page.locator("#info-content")).toContainText("75% verfügbar");
+  await page.evaluate(() => handleEvent({ method: "account/rateLimits/updated", params: { rateLimits: { primary: { usedPercent: 40, windowDurationMins: 300 }, secondary: { usedPercent: 80, windowDurationMins: 10080 } } } }));
+  await expect(page.locator("#activity-usage-primary")).toHaveText("60%");
+  await expect(page.locator("#activity-usage-weekly")).toHaveText("20%");
 });
 
 test("historical images recover after reload and remain mounted while more messages arrive", async ({
@@ -1041,35 +1046,20 @@ test("full-text search opens an older exact message without loading the whole ch
   await removeProject(page, project, true);
 });
 
-test("task dashboard, notifications, context, panel widths and release hints work", async ({
+test("task dashboard, context, panel widths and informational release checks work", async ({
   page,
   context,
 }) => {
   test.skip(Boolean(process.env.TEST_BASE_URL), "Synthetic task fixture only.");
-  await context.grantPermissions(["notifications"]);
-  await page.addInitScript(() => {
-    window.testNotifications = [];
-    window.Notification = class {
-      static permission = "granted";
-      constructor(title, options) {
-        window.testNotifications.push({ title, ...options });
-      }
-      close() {}
-    };
-  });
   await login(page);
   const p = await createProject(page);
   await page.locator("#version-button").click();
-  await page.locator("#enable-notifications").check();
-  await expect
-    .poll(
-      async () =>
-        (await api(page, "/api/workbench", undefined, "GET")).preferences
-          .notifications,
-    )
-    .toBe(true);
+  await expect(page.locator("#work-settings-dialog h2")).toHaveText("Info");
+  await expect(page.locator("#enable-notifications, #enable-sound, #reset-panel-sizes")).toHaveCount(0);
   await page.locator("#check-version").click();
   await expect(page.locator("#version-details")).toContainText("9.0.0");
+  await expect(page.locator("#version-details")).toContainText("Neue Version verfügbar");
+  await expect(page.locator("#version-details")).toContainText("5. November 2026");
   await page.locator("#work-settings-dialog [data-feature-close]").click();
   await page.locator("#prompt").fill("WAIT_TEST");
   await page.locator("#prompt").press("Shift+Enter");
@@ -1083,9 +1073,6 @@ test("task dashboard, notifications, context, panel widths and release hints wor
   await page.locator("#open-tasks").click();
   await expect(page.locator(".task-dashboard")).toBeVisible();
   await expect(page.locator(".task-status.working")).toBeVisible();
-  await expect
-    .poll(() => page.evaluate(() => window.testNotifications.length))
-    .toBeGreaterThan(0);
   await page.locator("[data-task-refresh]").click();
   await expect(
     page.locator(`[data-task="${taskId}"] .task-status`),

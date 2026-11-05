@@ -33,7 +33,7 @@ docker compose -f compose.image.yml up -d
 
 `latest` ist ein veränderliches Tag. Ein explizites `pull` lädt die aktuelle Fassung; ein laufender Container übernimmt sie erst bei seiner Neuerstellung. Ein festes Versionstag bleibt bei dieser Version. Die Versionsanzeige in Codex-Web prüft Releases und führt selbst keine Updates aus.
 
-Passwort und Einstellungen bleiben im Datenvolume. Werte aus den Einstellungen haben weiterhin Vorrang vor geänderten ENV-Werten, bis das betreffende Feld geleert beziehungsweise auf **ENV verwenden** zurückgesetzt wird.
+Passwort und Einstellungen bleiben im Datenvolume. Werte aus den Einstellungen haben weiterhin Vorrang vor geänderten ENV-Werten, bis das betreffende Feld geleert beziehungsweise auf **Standard verwenden** zurückgesetzt wird.
 
 ## Updates aus Quellcode
 
@@ -44,13 +44,6 @@ git pull --ff-only
 docker compose up -d --build
 ```
 
-Den Gateway nur dann aktualisieren, wenn dessen Änderungen benötigt werden:
-
-```bash
-docker compose -f compose.gateway.yml up -d --build
-```
-
-Das startet den Gateway neu. Der unabhängig laufende Codex-Daemon wird dadurch nicht ersetzt.
 
 ## Sicherungen
 
@@ -67,9 +60,9 @@ docker compose ps
 docker compose logs --tail=100 web
 ```
 
-Auf dem Codex-Host entsprechend `-f compose.gateway.yml` und den Dienst `gateway` verwenden. Protokolle vor dem Weitergeben auf vertrauliche Inhalte prüfen.
+Protokolle vor dem Weitergeben auf vertrauliche Inhalte prüfen.
 
-Der öffentliche Web-Endpunkt `/healthz` bestätigt nur den Webserver. Mit einer angemeldeten Sitzung ergänzt er den Verbindungsstatus. Der Gateway-Healthcheck prüft ebenfalls nur seinen eigenen Webserver.
+Der öffentliche Web-Endpunkt `/healthz` bestätigt nur den Webserver. Mit einer angemeldeten Sitzung ergänzt er den Verbindungsstatus.
 
 ## Release-Artefakte
 

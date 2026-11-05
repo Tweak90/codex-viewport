@@ -3,7 +3,7 @@ const dictionary = JSON.parse(await readFile(new URL("../public/locales/en.json"
 const normalize = (text) => text.replace(/\s+/g, " ").trim();
 let references = 0;
 const missing = new Set();
-for (const file of ["app.js", "features.js", "settings.js", "questions.js", "queue.js"]) {
+for (const file of ["app.js", "features.js", "settings.js", "questions.js", "queue.js", "agents.js"]) {
   const source = await readFile(new URL(`../public/${file}`, import.meta.url), "utf8");
   for (const match of source.matchAll(/I18N\.t\(("(?:[^"\\]|\\.)*")\)/g)) {
     references++;

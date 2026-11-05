@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, stat, rm } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, stat, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { SettingsStore } from "../lib/settings.mjs";
@@ -28,6 +28,33 @@ test("saved settings override ENV, blanks restore ENV and secrets stay out of re
   assert.equal(loaded.snapshot().fields.find(f => f.name === "CODEX_API_TOKEN").hasOverride, false);
   assert.equal(loaded.value("CODEX_WEB_LANGUAGE"), "en");
   assert.ok(!JSON.parse(await readFile(loaded.filename)).overrides.CODEX_API_TOKEN);
+});
+test("unsupported saved settings are removed while valid overrides survive", async (t) => {
+  const root = await directory(t);
+  await writeFile(path.join(root, "settings.json"), JSON.stringify({ version: 1, overrides: { HOST_LABEL: "Saved host", RETIRED_OPTION: "obsolete" } }));
+  const settings = await SettingsStore.load(root, {});
+  assert.equal(settings.value("HOST_LABEL"), "Saved host");
+  const saved = JSON.parse(await readFile(settings.filename));
+  assert.deepEqual(saved.overrides, { HOST_LABEL: "Saved host" });
+  await assert.rejects(settings.update({ RETIRED_OPTION: "new value" }), error => error.status === 400);
+});
+test("without ENV settings use English and sensible defaults; configured ENV remains distinguishable from overrides", async (t) => {
+  const defaults = await SettingsStore.load(await directory(t), {});
+  assert.equal(defaults.value("CODEX_WEB_LANGUAGE"), "en");
+  assert.equal(defaults.value("CODEX_SEND_WITH"), "shiftEnter");
+  assert.equal(defaults.value("CODEX_FOLLOWUP_MODE"), "steer");
+  assert.equal(defaults.value("HOST_LABEL"), "Codex-Host");
+  assert.equal(defaults.value("CODEX_RELEASE_REPOSITORY"), "Tweak90/codex-web");
+  assert.equal(defaults.value("CODEX_WS_URL"), "");
+  assert.equal(defaults.snapshot().fields.find(f => f.name === "HOST_LABEL").source, "default");
+  const configured = await SettingsStore.load(await directory(t), { CODEX_WEB_LANGUAGE: "de" });
+  assert.equal(configured.snapshot().fields.find(f => f.name === "CODEX_WEB_LANGUAGE").source, "env");
+  await configured.update({ CODEX_WEB_LANGUAGE: "en" });
+  const field = configured.snapshot().fields.find(f => f.name === "CODEX_WEB_LANGUAGE");
+  assert.equal(field.source, "settings");
+  assert.equal(field.fallbackSource, "env");
+  await configured.update({ CODEX_WEB_LANGUAGE: "" });
+  assert.equal(configured.value("CODEX_WEB_LANGUAGE"), "de");
 });
 test("settings reject invalid endpoints and paths and preserve concurrent independent saves", async (t) => {
   const settings = await SettingsStore.load(await directory(t), {});

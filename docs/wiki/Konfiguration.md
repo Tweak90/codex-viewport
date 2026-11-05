@@ -2,65 +2,60 @@
 
 [English](en-Configuration.md) · [Deutsche Startseite](de-Home.md)
 
-`.env.example` enthält neutrale Beispiele. Eine lokale `.env` wird nicht versioniert. Docker kann eine Umgebungsdatei mit `--env-file` laden; Compose liest `.env` für die gewählte Rolle.
+Der Web-Container verbindet sich ausschließlich über WebSocket mit einer externen Codex-API. `.env.example` enthält neutrale Beispiele. Docker liest die Datei über `--env-file`; Compose verwendet `.env`.
 
-## Web-Container
+## Anwendungsvariablen
 
 | Variable | Zweck | Vorgabe |
 | --- | --- | --- |
-| `CODEX_WS_URL` | WebSocket-Ziel des Codex-Hosts | In Compose erforderlich |
-| `CODEX_API_TOKEN` | Bearer-Token des Gateways oder passenden API-Endpunkts | In `compose.image.yml` erforderlich |
-| `WEB_BIND_IP` | Bind-Adresse des veröffentlichten Browserports | `0.0.0.0` |
-| `WEB_PORT` | Browserport auf dem Web-Host | `8787` |
-| `CODEX_WEB_LANGUAGE` | Sprache ohne gespeicherte Einstellung | `de`; alternativ `en` |
-| `CODEX_FOLLOWUP_MODE` | Folgenachrichten bei laufendem Auftrag | `steer`; alternativ `queue` |
+| `CODEX_WS_URL` | Externe Codex-API-Adresse mit `ws://` oder `wss://` | Leer; für die Verbindung über ENV oder Einstellungen setzen |
+| `CODEX_API_TOKEN` | Bearer-Token, falls die API einen verlangt | Leer |
+| `HOST_LABEL` | Anzeigename des Codex-Hosts | `Codex-Host` |
+| `CODEX_PROJECTS_ROOT` | Basisverzeichnis neuer Projekte auf dem Codex-Host | Aus Codex-Metadaten abgeleitet, endet auf `codex-projects` |
+| `CODEX_WEB_LANGUAGE` | Sprache ohne gespeicherte Einstellung | `en`; alternativ `de` |
 | `CODEX_SEND_WITH` | Sendetaste ohne gespeicherte Einstellung | `shiftEnter`; alternativ `enter` |
-| `HOST_LABEL` | Anzeigename in der Oberfläche | `KI-VM` |
-| `CODEX_PROJECTS_ROOT` | Basisverzeichnis für neue Projekte auf dem Codex-Host | Aus Codex-Metadaten abgeleitet, endet auf `codex-projects` |
-| `CODEX_WEB_IMAGE` | Image für `compose.image.yml` | `ghcr.io/tweak90/codex-web-ui:latest` |
-| `CODEX_RELEASE_REPOSITORY` | GitHub-Repository für Updatehinweise | Das Projekt-Repository; Format `owner/repo` |
-| `CODEX_GITHUB_TOKEN` | Optionaler lesender GitHub-Token für Updatehinweise | Leer; andernfalls wird `gh` auf dem Codex-Host verwendet |
+| `CODEX_FOLLOWUP_MODE` | Folgenachrichten während laufender Arbeit | `steer`; alternativ `queue` |
+| `CODEX_RELEASE_REPOSITORY` | Repository für Releasehinweise im Format `owner/repo` | Dieses Projekt |
+| `CODEX_GITHUB_TOKEN` | Optionaler lesender Token für Releaseabfragen | Leer; öffentliche Releases werden ohne Anmeldung geprüft |
 
-`CODEX_API_TOKEN` ist der Zugang zur Codex-Verbindung. Er ist nicht das Browserpasswort und kein OpenAI-API-Key.
+`CODEX_API_TOKEN` ist unabhängig vom Browserpasswort und kein OpenAI-API-Key. Projektpfade beziehen sich auf den Codex-Host und werden über die API angesprochen.
 
-## Gateway
+## Einstellungen und ENV-Vorrang
 
-| Variable | Zweck | Vorgabe beziehungsweise Beispiel |
-| --- | --- | --- |
-| `API_BIND_IP` | Bind-Adresse des Gateway-Ports | `0.0.0.0` |
-| `API_PORT` | Gateway-Port auf dem Codex-Host | `4500` |
-| `CODEX_SOCKET_DIR` | Verzeichnis des Control-Sockets | `${HOME}/.codex/app-server-control` |
-| `CODEX_RUNTIME_SOCKET_DIR` | Verzeichnis des tatsächlichen Socket-Ziels | `/tmp/codex-daemon-1000` |
-| `CODEX_UID` / `CODEX_GID` | Benutzer und Gruppe des Gateway-Prozesses | `1000` / `1000`, an Installation anpassen |
+**Einstellungen** steht in der linken Seitenleiste direkt über **Kontingente**. Der Dialog enthält drei Bereiche:
 
-Der Gateway benötigt Zugriff auf den vorhandenen Control-Socket. Er erhält keine Projektverzeichnisse und keinen Docker-Socket.
+- **Allgemeine Einstellungen:** Sprache, Sendetaste und Folgenachrichten.
+- **Codex-Einstellungen:** Anzeigename, API-Adresse und Token sowie Projektbasis.
+- **Updates:** Release-Repository, optionaler GitHub-Token und Info-Dialog.
 
-## Direkter Node-Start
+Jedes Feld zeigt, ob ein eigener Wert, ENV oder eine Vorgabe gilt. **ENV-Details** klappt Variablenname und Rückfallwert auf. Eingaben bleiben beim Bereichswechsel erhalten; **Speichern** und **Abbrechen** bleiben sichtbar.
 
-Für `npm start` sind außerdem `CODEX_SOCKET`, `DATA_DIR`, `PORT` und `BIND_ADDRESS` verfügbar. Ohne WebSocket-Ziel wird der lokale Control-Socket des Benutzerverzeichnisses verwendet. Im Docker-Image liegen die Web-Daten standardmäßig unter `/data` und der Webserver lauscht intern auf Port `8787`.
-
-## Browserpasswort
-
-Das Passwort wird ausschließlich in der Oberfläche eingerichtet. Es gibt keine Passwortvorgabe in `.env`. Das Datenvolume enthält den Passwort-Hash und die Sitzungen; ein normales Update ändert diese Daten nicht.
-
-## Reverse Proxy
-
-Der Proxy muss WebSocket-Upgrades sowohl für `/events` als auch für einen gegebenenfalls vorgeschalteten API-Gateway unterstützen. Für längere Aufgaben sind ausreichend lange Verbindungszeitlimits erforderlich. Bei TLS-Terminierung `Host`, gegebenenfalls `X-Forwarded-Host` und `X-Forwarded-Proto` passend weiterreichen. Diese Angaben werden unter anderem für Herkunftsprüfung und Cookie-Einstellungen verwendet.
-
-Desktop-Browserbenachrichtigungen benötigen HTTPS oder localhost und eine Browserberechtigung. Hinweise innerhalb der App funktionieren auch ohne diese Browserfunktion.
-
-## Rollen nicht verwechseln
-
-Die OpenAI-Anmeldung liegt auf dem Codex-Host. Das Browserpasswort schützt Codex-Web. Der Gateway-Token schützt die Verbindung zum Codex-Host. Eine GitHub-Registry-Anmeldung dient dem Image-Pull; ein Git-Deploy-Key dient dem Repository-Abruf. Diese Zugänge erfüllen unterschiedliche Aufgaben.
-
-## Einstellungen in der Oberfläche
-
-Das Zahnrad links öffnet die Einstellungen. Sie gelten für diese gemeinsam genutzte Webinstanz und bleiben im Volume in `settings.json` gespeichert.
-
-- **Leeres Feld / ENV verwenden:** Der ENV-Wert gilt, andernfalls die dokumentierte Vorgabe.
+- **Leeres Feld / Standard verwenden:** Der ENV-Wert gilt, andernfalls die dokumentierte Vorgabe.
 - **Ausgefülltes Feld:** Die gespeicherte Einstellung hat Vorrang vor ENV.
-- Geheime Werte werden nicht zurück an den Browser übertragen. Ein als aktiv angezeigter gespeicherter Wert bleibt ohne Änderung erhalten. **ENV verwenden** entfernt den gespeicherten Override; eine neue Eingabe ersetzt ihn.
+- Geheime Werte werden nicht an den Browser zurückgegeben. Ein gespeicherter geheimer Wert bleibt ohne Bearbeitung erhalten. **Standard verwenden** entfernt ausdrücklich diesen Override.
 
-Einstellbar sind Sprache, Enter-Belegung, Behandlung von Folgenachrichten, Hostname, WebSocket-Adresse, API-Token, lokaler Control-Socket, Projektbasis und GitHub-Releasezugang. Änderungen an Hostname, Projektbasis und Releasezugang gelten sofort. Eine geänderte Codex-Verbindung wird neu verbunden; während offener API-Aufrufe wird der Wechsel abgelehnt. Gesendete Aufträge werden nicht wiederholt. Ein anderer Codex-Host besitzt möglicherweise andere absolute Projektpfade.
+Overrides liegen in `settings.json` im Datenvolume. Nicht mehr unterstützte Einstellungen früherer Installationen werden beim Start entfernt; aktuelle Vorgaben bleiben erhalten. Eine geänderte API-Verbindung wird neu verbunden; während offener API-Aufrufe wird der Wechsel abgelehnt. Gesendete Aufträge werden nicht wiederholt. Ein anderer Codex-Host kann andere absolute Projektpfade besitzen.
 
-Docker-Portfreigaben, Image-Auswahl, Volume-Mounts, Prozess-Bind-Adresse und Gateway-Parameter werden beim Containerstart festgelegt. Sie bleiben Teil der Docker-/Compose-Konfiguration. Die Weboberfläche verwaltet keine Container und startet keine Deployments.
+## Docker- und Node-Start
+
+| Variable | Zweck | Vorgabe |
+| --- | --- | --- |
+| `WEB_BIND_IP` / `WEB_PORT` | Veröffentlichte Docker-Browseradresse und Port | `0.0.0.0` / `8787` |
+| `CODEX_WEB_IMAGE` | Image für `compose.image.yml` | `ghcr.io/tweak90/codex-web-ui:latest` |
+| `DATA_DIR` | Web-Daten beim direkten Node-Start | `.data`; `/data` in Docker |
+| `PORT` / `BIND_ADDRESS` | HTTP-Listener des Node-Prozesses | `8787` / `0.0.0.0` |
+
+Ports, Volumes und Image-Auswahl gehören zur Docker-/Compose-Konfiguration. Der Einstellungsdialog verwaltet keine Container und startet keine Deployments.
+
+## Browserpasswort und Reverse Proxy
+
+Das Passwort wird in der Oberfläche festgelegt; ENV enthält keine Passwortvorgabe. Das Datenvolume bei Updates beibehalten, damit Anmeldung und Einstellungen erhalten bleiben.
+
+
+## Standardwerte und Info
+
+Ohne ENV und gespeicherte Overrides verwendet die Oberfläche Englisch, Shift+Enter zum Senden, steuernde Folgenachrichten, `Codex-Host` als Anzeigenamen und das Projekt-Repository für Releases. Die Projektbasis stammt aus Codex-Metadaten; Zugangstoken sind leer. Die API-Adresse muss über ENV oder Einstellungen gesetzt werden. Compose kann die Weboberfläche schon vorher starten; die Verbindung bleibt bis zum Hinterlegen des Endpunkts offline.
+
+Konfigurierte Umgebungswerte sind als **Umgebungswert** markiert. **Eigener Wert** kennzeichnet einen gespeicherten Override; **Standard verwenden** entfernt ihn. Die aufklappbaren ENV-Details zeigen den Rückfallwert. Eine bereits gespeicherte Sprachwahl bleibt bei Updates erhalten.
+
+**Info** enthält die installierte Version und eine lesende GitHub-Releaseprüfung mit aktueller Versionsnummer und Veröffentlichungsdatum. Öffentliche Abfragen erfolgen ohne Anmeldung, Codex-Host-Befehl oder Docker-Zugriff. Zwischengespeicherte Ergebnisse reduzieren Wiederholungen; **Nach Updates suchen** fragt neu ab. Ein Token ist für private Repositorys oder ein höheres GitHub-Anfragelimit optional.

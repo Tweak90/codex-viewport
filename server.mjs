@@ -12,6 +12,7 @@ import { createWorkbench } from "./lib/work-routes.mjs";
 import { randomUUID } from "node:crypto";
 import { translate } from "./lib/i18n.mjs";
 import { SettingsStore } from "./lib/settings.mjs";
+import { listProjectAgents, readProjectAgent } from "./lib/agents.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const allowed = new Set([
@@ -70,30 +71,31 @@ export async function createConsoleServer({
   bridge,
   dataDir,
   projectRoot,
-  hostLabel = "KI-VM",
+  hostLabel,
+  environment = process.env,
+  releaseFetcher,
 }) {
   const auth = await AuthStore.load(dataDir);
   const settings = await SettingsStore.load(dataDir, {
-    ...process.env,
-    HOST_LABEL: hostLabel,
-    CODEX_PROJECTS_ROOT: projectRoot || process.env.CODEX_PROJECTS_ROOT || "",
-    CODEX_WS_URL: bridge.options?.url ?? process.env.CODEX_WS_URL ?? "",
-    CODEX_API_TOKEN: bridge.options?.token ?? process.env.CODEX_API_TOKEN ?? "",
-    CODEX_SOCKET: bridge.options?.socket || process.env.CODEX_SOCKET || `${process.env.HOME}/.codex/app-server-control/app-server-control.sock`,
+    ...environment,
+    ...(hostLabel === undefined ? {} : { HOST_LABEL: hostLabel }),
+    ...(projectRoot === undefined ? {} : { CODEX_PROJECTS_ROOT: projectRoot }),
+    ...(bridge.options?.url === undefined ? {} : { CODEX_WS_URL: bridge.options.url }),
+    ...(bridge.options?.token === undefined ? {} : { CODEX_API_TOKEN: bridge.options.token }),
   });
   const bridgeOptions = (overrides) => ({
     url: settings.value("CODEX_WS_URL", overrides),
     token: settings.value("CODEX_API_TOKEN", overrides),
-    socket: settings.value("CODEX_SOCKET", overrides),
   });
   if (bridge instanceof CodexBridge) {
     bridge.options = bridgeOptions();
-    bridge.status.transport = bridge.options.url ? "websocket" : "unix";
+    bridge.status.transport = "websocket";
   }
   hostLabel = settings.value("HOST_LABEL");
   const preferences = () => ({ language: settings.value("CODEX_WEB_LANGUAGE"), sendWith: settings.value("CODEX_SEND_WITH"), followupMode: settings.value("CODEX_FOLLOWUP_MODE") });
   const projects = await ProjectStore.load(dataDir, bridge, settings.value("CODEX_PROJECTS_ROOT"));
   const workbench = await createWorkbench({
+    releaseFetcher,
     projects,
     dataDir,
     broadcast,
@@ -221,6 +223,13 @@ export async function createConsoleServer({
           "X-Content-Type-Options": "nosniff",
         });
         return res.end(image.content);
+      }
+      const agentsMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/agents(?:\/([^/]+))?$/);
+      if (req.method === "GET" && agentsMatch) {
+        const project = projects.find(decodeURIComponent(agentsMatch[1]));
+        return json(res, 200, agentsMatch[2]
+          ? await readProjectAgent(bridge, project, decodeURIComponent(agentsMatch[2]), url.searchParams.get("cursor"))
+          : await listProjectAgents(bridge, project, url.searchParams.get("cursor")));
       }
       const mediaMatch = url.pathname.match(
         /^\/api\/projects\/([^/]+)\/media$/,
@@ -381,6 +390,7 @@ export async function createConsoleServer({
         "/questions.js": ["public/questions.js", "text/javascript; charset=utf-8"],
         "/queue.js": ["public/queue.js", "text/javascript; charset=utf-8"],
         "/settings.js": ["public/settings.js", "text/javascript; charset=utf-8"],
+        "/agents.js": ["public/agents.js", "text/javascript; charset=utf-8"],
         "/locales/en.json": ["public/locales/en.json", "application/json; charset=utf-8"],
         "/features.js": [
           "public/features.js",
@@ -402,10 +412,7 @@ export async function createConsoleServer({
       const content = await readFile(path.join(root, file[0]));
       res.writeHead(200, {
         "Content-Type": file[1],
-        "Cache-Control":
-          url.pathname === "/assets/logo.png"
-            ? "public, max-age=86400"
-            : "no-cache",
+        "Cache-Control": "no-cache",
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "same-origin",
       });
@@ -498,15 +505,12 @@ if (
   const bridge = new CodexBridge({
     url: process.env.CODEX_WS_URL,
     token: process.env.CODEX_API_TOKEN,
-    socket:
-      process.env.CODEX_SOCKET ||
-      `${process.env.HOME}/.codex/app-server-control/app-server-control.sock`,
   });
   const app = await createConsoleServer({
     bridge,
     dataDir: process.env.DATA_DIR || path.join(root, ".data"),
     projectRoot: process.env.CODEX_PROJECTS_ROOT,
-    hostLabel: process.env.HOST_LABEL || "KI-VM",
+    hostLabel: process.env.HOST_LABEL,
   });
   bridge.connect().catch((e) => console.error("Codex:", e.message));
   app.server.listen(

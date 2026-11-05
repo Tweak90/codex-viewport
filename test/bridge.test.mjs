@@ -2,22 +2,19 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import { createServer } from "node:http";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
 import { WebSocketServer } from "ws";
 import { CodexBridge } from "../lib/bridge.mjs";
 
-async function fixture(t, { unix = false } = {}) {
-  const directory = unix ? await mkdtemp(path.join(tmpdir(), "cw-sock-")) : null;
-  const socket = directory && path.join(directory, "control.sock");
+async function fixture(t, { token } = {}) {
   const http = createServer();
   const server = new WebSocketServer({ server: http });
-  http.listen(socket || 0, socket ? undefined : "127.0.0.1");
+  http.listen(0, "127.0.0.1");
   await once(http, "listening");
   const messages = [];
   const peers = [];
-  server.on("connection", (ws) => {
+  const authorization = [];
+  server.on("connection", (ws, request) => {
+    authorization.push(request.headers.authorization);
     peers.push(ws);
     ws.on("message", (data) => {
       const message = JSON.parse(data);
@@ -38,25 +35,34 @@ async function fixture(t, { unix = false } = {}) {
     });
   });
   const bridge = new CodexBridge({
-    ...(unix ? { socket } : { url: `ws://127.0.0.1:${http.address().port}` }),
+    url: `ws://127.0.0.1:${http.address().port}`, token,
   });
   t.after(async () => {
     bridge.close();
     for (const peer of peers) peer.terminate();
     await new Promise((resolve) => server.close(resolve));
     await new Promise((resolve) => http.close(resolve));
-    if (directory) await rm(directory, { recursive: true, force: true });
   });
   await bridge.connect();
-  return { bridge, peers, messages };
+  return { bridge, peers, messages, authorization };
 }
 
-test("initializes and exchanges RPC over the local Unix control socket", async (t) => {
-  const { bridge, messages } = await fixture(t, { unix: true });
-  assert.equal(bridge.status.transport, "unix");
+test("initializes and exchanges RPC over the WebSocket API with optional bearer authentication", async (t) => {
+  const { bridge, messages, authorization } = await fixture(t, { token: "example-api-token" });
+  assert.equal(bridge.status.transport, "websocket");
+  assert.equal(authorization[0], "Bearer example-api-token");
   assert.equal(bridge.status.connected, true);
   assert.equal(messages[0].method, "initialize");
-  assert.equal((await bridge.call("test/unix")).ok, true);
+  assert.equal((await bridge.call("test/websocket")).ok, true);
+});
+
+test("requires an explicit WebSocket API endpoint", async (t) => {
+  for (const url of [undefined, "http://codex-host.example:4500"]) {
+    const bridge = new CodexBridge({ url });
+    t.after(() => bridge.close());
+    await assert.rejects(bridge.connect(), /ws:\/\/ oder wss:\/\//);
+    assert.equal(bridge.transport, undefined);
+  }
 });
 
 test("routes concurrent responses and preserves structured API errors", async (t) => {

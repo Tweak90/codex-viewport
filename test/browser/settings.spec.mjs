@@ -31,11 +31,20 @@ test("gear settings persist English and Enter behavior, preserve user names and 
   await login(page);
   const p = await project(page, "Dateien");
   try {
+    await expect(page.locator("#activity-settings")).toHaveCount(0);
+    await expect(page.locator("#open-settings + #open-usage")).toHaveCount(1);
     await page.locator("#open-settings").click();
     await expect(page.locator("#application-settings-dialog")).toBeVisible();
+    await expect(page.locator("#settings-panel-general")).toBeVisible();
+    await expect(page.locator("#setting-CODEX_WS_URL")).not.toBeVisible();
     await page.locator("#setting-CODEX_WEB_LANGUAGE").selectOption("en");
     await page.locator("#setting-CODEX_SEND_WITH").selectOption("enter");
+    await page.locator('[data-settings-tab="codex"]').click();
     await page.locator("#setting-HOST_LABEL").fill("Custom browser host");
+    await page.locator('[data-settings-tab="general"]').click();
+    await page.locator('[data-settings-tab="codex"]').click();
+    await expect(page.locator("#setting-HOST_LABEL")).toHaveValue("Custom browser host");
+    await expect(page.locator("#application-settings-status")).toContainText("Noch nicht gespeichert");
     await page.locator("#save-application-settings").click();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.locator("#application")).toBeVisible();
@@ -52,9 +61,13 @@ test("gear settings persist English and Enter behavior, preserve user names and 
     await expect(page.locator(".message.user")).toHaveCount(1);
     await expect(page.locator(".message.user")).toContainText("Second line");
     await page.locator("#open-settings").click();
-    await expect(page.locator("#application-settings-dialog")).toContainText("Empty field: use the ENV value.");
+    await expect(page.locator("#application-settings-dialog")).toContainText("Empty fields use the environment configuration (ENV)");
+    await page.locator('[data-settings-tab="codex"]').click();
     await page.locator('[data-setting-reset="HOST_LABEL"]').click();
+    await page.locator('[data-settings-tab="general"]').click();
     await page.locator('[data-setting-reset="CODEX_WEB_LANGUAGE"]').click();
+    await expect(page.locator("#settings-panel-general")).toBeVisible();
+    await expect(page.locator("#settings-panel-general")).toContainText("Choose which key combination");
     await page.locator('[data-setting-reset="CODEX_SEND_WITH"]').click();
     await page.locator("#save-application-settings").click();
     await expect(page.locator("html")).toHaveAttribute("lang", "de");

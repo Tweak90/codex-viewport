@@ -3,18 +3,14 @@
   const F = {
     pins: [],
     pinnedThreads: [],
-    preferences: {},
     attachments: [],
     uploading: 0,
     currentKey: null,
     drafts: new Map(),
     writes: new Map(),
     contexts: new Map(),
-    notices: new Set(),
-    waitingNotified: new Set(),
     inputRevision: 0,
     searchRevision: 0,
-    notificationCount: 0,
     async bootstrap() {
       if (!state.authenticated || F.loading) return;
       F.loading = true;
@@ -22,9 +18,7 @@
         const data = await api("/api/workbench");
         if (!state.authenticated) return;
         F.pins = data.pins;
-        F.preferences = data.preferences;
         await F.refreshPins();
-        F.renderPreferences();
         F.version(false).catch(() => {});
         F.refreshTasks().catch(() => {});
       } catch (error) {
@@ -198,7 +192,6 @@ ${I18N.t("Pfad auf der KI-VM:")} ${file.path}`,
         if (key.startsWith("codex.composer.")) localStorage.removeItem(key);
       $("prompt").value = "";
       F.renderAttachments();
-      F.notificationCount = 0;
       document.title = "Codex-Web · VM Console";
     },
     renderAttachments() {
@@ -514,37 +507,6 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
     },
     async refreshTasks() {
       const result = await api("/api/tasks");
-      const previous = new Map(
-        (F.tasks || []).map((task) => [task.threadId, task]),
-      );
-      for (const task of result.tasks) {
-        const old = previous.get(task.threadId);
-        if (
-          old &&
-          ["working", "waiting"].includes(old.status) &&
-          !["working", "waiting"].includes(task.status)
-        )
-          F.notify(
-            task.threadId,
-            task.status === "failed"
-              ? I18N.t("Aufgabe fehlgeschlagen")
-              : task.status === "interrupted"
-                ? I18N.t("Aufgabe gestoppt")
-                : I18N.t("Aufgabe abgeschlossen"),
-            task.threadId + ":" + task.turnId + ":" + task.status,
-          );
-        else if (
-          old &&
-          old.status !== "waiting" &&
-          task.status === "waiting" &&
-          !F.waitingNotified.has(task.threadId)
-        )
-          F.notify(
-            task.threadId,
-            I18N.t("Rückfrage oder Freigabe erforderlich"),
-            task.threadId + ":waiting:" + task.turnId,
-          );
-      }
       F.tasks = result.tasks;
       const active = result.tasks.filter((task) =>
         ["working", "waiting"].includes(task.status),
@@ -582,64 +544,14 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
       $("chat").innerHTML =
         `<section class="task-dashboard"><div class="gallery-heading"><div><div class="eyebrow">${I18N.t("PROJEKTÜBERGREIFEND")}</div><h1>${I18N.t("Aufgaben")}</h1></div><button class="subtle" type="button" data-task-refresh>${I18N.t("Aktualisieren ↻")}</button></div><p class="muted">${I18N.t("Laufende und zuletzt bearbeitete Chats")}</p>${(F.tasks || []).map((task) => `<article class="task-card" data-task="${escapeHtml(task.threadId)}"><div><span class="task-status ${escapeHtml(task.status)}">${labels[task.status] || I18N.t("Bereit")}</span><strong>${escapeHtml(task.name)}</strong><small>${escapeHtml(task.projectName)}${task.startedAt ? " · " + Math.max(0, Math.floor(((task.status === "working" || task.status === "waiting" ? Date.now() : task.updatedAt) - task.startedAt) / 1000)) + " s" : ""}</small>${task.error ? `<p class="danger-text">${escapeHtml(task.error)}</p>` : ""}</div><div><button type="button" class="subtle" data-task-open="${escapeHtml(task.threadId)}">${I18N.t("Chat öffnen")}</button>${["working", "waiting"].includes(task.status) ? `<button class="subtle danger-text" type="button" data-task-stop="${escapeHtml(task.threadId)}" data-turn-id="${escapeHtml(task.turnId || "")}">${I18N.t("Stoppen")}</button>` : ""}</div></article>`).join("") || `<p class="empty-list">${I18N.t("Noch keine Aufgaben vorhanden.")}</p>`}</section>`;
     },
-    notify(threadId, message, key) {
-      if (!F.preferences.notifications && !F.preferences.sound) return;
-      if (F.notices.has(key)) return;
-      F.notices.add(key);
-      if (F.notices.size > 200)
-        F.notices.delete(F.notices.values().next().value);
-      const thread = getThread(threadId),
-        project = state.projects.find(
-          (p) => p.id === threadProjectId(thread || {}),
-        );
-      const body = [
-        project?.name,
-        thread?.name || thread?.preview?.slice(0, 60),
-        message,
-      ]
-        .filter(Boolean)
-        .join(" · ");
-      toast(body);
-      F.notificationCount++;
-      document.title = `(${F.notificationCount}) Codex-Web`;
-      if (
-        F.preferences.notifications &&
-        globalThis.Notification?.permission === "granted" &&
-        (document.hidden || state.thread?.id !== threadId)
-      ) {
-        const notification = new Notification("Codex-Web", {
-          body,
-          icon: "/assets/logo.png",
-          tag: key,
-        });
-        notification.onclick = () => {
-          window.focus();
-          safe(() => openThread(threadId))();
-          notification.close();
-        };
-      }
-      if (F.preferences.sound && F.audio?.state === "running") {
-        const oscillator = F.audio.createOscillator(),
-          gain = F.audio.createGain();
-        oscillator.connect(gain);
-        gain.connect(F.audio.destination);
-        gain.gain.value = 0.05;
-        oscillator.frequency.value = 660;
-        oscillator.start();
-        oscillator.stop(F.audio.currentTime + 0.14);
-      }
-    },
     handleEvent(message) {
       const { method, params: p = {} } = message;
       if (method === "turn/started") {
-        F.waitingNotified.delete(p.threadId);
         F.refreshTasks().catch(() => {});
       }
       if (method === "console/workbench") {
         F.pins = p.pins;
-        F.preferences = p.preferences;
         F.refreshPins().catch(() => {});
-        F.renderPreferences();
       }
       if (method === "thread/tokenUsage/updated") {
         F.contexts.set(p.threadId, {
@@ -658,24 +570,7 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
         F.updateContext();
       }
       if (method === "turn/completed") {
-        F.notify(
-          p.threadId,
-          p.turn.status === "failed"
-            ? I18N.t("Aufgabe fehlgeschlagen")
-            : p.turn.status === "interrupted"
-              ? I18N.t("Aufgabe gestoppt")
-              : I18N.t("Aufgabe abgeschlossen"),
-          p.threadId + ":" + p.turn.id + ":" + p.turn.status,
-        );
         F.refreshTasks().catch(() => {});
-      }
-      if (message.id !== undefined && p.threadId) {
-        F.waitingNotified.add(p.threadId);
-        F.notify(
-          p.threadId,
-          I18N.t("Rückfrage oder Freigabe erforderlich"),
-          p.threadId + ":request:" + message.id,
-        );
       }
     },
     focusHistory() {
@@ -739,15 +634,6 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
           $("global-search-status").textContent = error.message;
       }
     },
-    renderPreferences() {
-      $("enable-notifications").checked = Boolean(F.preferences.notifications);
-      $("enable-sound").checked = Boolean(F.preferences.sound);
-      $("notification-support").textContent = !globalThis.isSecureContext
-        ? I18N.t("Browsermeldungen benötigen HTTPS oder localhost. Hinweise in der App und der optionale Ton sind weiterhin nutzbar.")
-        : globalThis.Notification?.permission === "denied"
-          ? I18N.t("Browsermeldungen sind in diesem Browser blockiert. Hinweise in der App bleiben aktiv.")
-          : "";
-    },
     async version(force) {
       const value = await api("/api/version?check=" + (force ? "force" : "1"));
       F.release = value;
@@ -763,8 +649,9 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
     },
     renderVersion() {
       const value = F.release;
+      const published = value?.publishedAt ? new Date(value.publishedAt).toLocaleDateString(I18N.locale, { year: "numeric", month: "long", day: "numeric" }) : null;
       $("version-details").innerHTML = value
-        ? `<strong>${I18N.t("Installiert:")} ${escapeHtml(value.current)}</strong><p>${value.updateAvailable ? I18N.t("Neue Version: ") + escapeHtml(value.latest) : value.latest ? I18N.t("Aktuell verfügbar: ") + escapeHtml(value.latest) : I18N.t("Noch keine Release-Information verfügbar.")}</p>${value.error ? `<p class="muted">${escapeHtml(value.error)}</p>` : ""}<a href="${escapeHtml(value.url)}" target="_blank" rel="noopener noreferrer">${I18N.t("GitHub-Releases öffnen ↗")}</a><p class="muted">${I18N.t("Updates werden über Docker oder Compose installiert.")}</p>`
+        ? `<strong>${I18N.t("Installiert:")} ${escapeHtml(value.current)}</strong><p class="release-state">${value.updateAvailable ? I18N.t("Neue Version verfügbar") : value.latest ? I18N.t("Keine neuere Version verfügbar.") : I18N.t("Noch keine Release-Information verfügbar.")}</p>${value.latest ? `<dl class="release-details"><dt>${I18N.t("Version")}</dt><dd>${escapeHtml(value.latest)}</dd><dt>${I18N.t("Veröffentlicht am")}</dt><dd>${escapeHtml(published || I18N.t("Nicht verfügbar"))}</dd></dl>` : ""}${value.error ? `<p class="muted">${escapeHtml(I18N.t(value.error))}</p>` : ""}<a href="${escapeHtml(value.url)}" target="_blank" rel="noopener noreferrer">${I18N.t("GitHub-Releases öffnen ↗")}</a><p class="muted">${I18N.t("Die Prüfung liest nur Release-Informationen. Aktualisierungen führt der Betreiber durch.")}</p>`
         : I18N.t("Release-Information wird geladen …");
     },
   };
@@ -776,7 +663,7 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
   <dialog id="global-search-dialog" class="wide-dialog"><div class="dialog-heading"><h2>${I18N.t("Chats durchsuchen")}</h2><button type="button" class="icon-button" data-feature-close aria-label="${I18N.t("Schließen")}">×</button></div><input id="global-search-input" type="search" placeholder="${I18N.t("Alle Nachrichten und Aktivitäten durchsuchen …")}" aria-label="${I18N.t("Volltextsuche")}"><div class="search-options"><select id="global-search-project" aria-label="${I18N.t("Suchprojekt")}"></select><label><input type="checkbox" id="global-search-archive" checked> ${I18N.t("Archiv einbeziehen")}</label><button class="subtle" type="button" id="refresh-search-index">${I18N.t("Index aktualisieren")}</button></div><p id="global-search-status" role="status" class="muted"></p><div id="global-search-results"></div></dialog>
   <dialog id="project-settings-dialog"><form id="project-settings-form"><div class="dialog-heading"><h2 id="project-settings-title">${I18N.t("Projektvorgaben")}</h2><button type="button" class="icon-button" data-feature-close aria-label="${I18N.t("Schließen")}">×</button></div><label>${I18N.t("Standardmodell")}<select id="project-default-model"></select></label><label>${I18N.t("Denkaufwand")}<select id="project-default-effort"><option value="">${I18N.t("Modellvorgabe")}</option>${["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"].map((value) => `<option>${value}</option>`).join("")}</select></label><label>${I18N.t("Projektanweisungen")}<textarea id="project-instructions" rows="7" maxlength="20000" placeholder="${I18N.t("Zum Beispiel: Antworte auf Deutsch. Verwende die vorhandenen Projektkonventionen.")}"></textarea></label><p class="muted">${I18N.t("Modell und Denkaufwand gelten als Vorgabe für neue Chats. Projektanweisungen werden beim Start oder erneuten Öffnen eines Chats übernommen.")}</p><p id="project-settings-error" class="form-error"></p><div class="dialog-actions"><button type="button" class="subtle" data-feature-close>${I18N.t("Abbrechen")}</button><button type="submit" class="accent-button">${I18N.t("Speichern")}</button></div></form></dialog>
   <dialog id="context-dialog"><div class="dialog-heading"><h2>${I18N.t("Chatkontext")}</h2><button type="button" class="icon-button" data-feature-close aria-label="${I18N.t("Schließen")}">×</button></div><div id="context-content"></div><div class="dialog-actions"><button id="context-refresh" type="button" class="subtle">${I18N.t("Aktualisieren")}</button><button id="context-compact" type="button" class="accent-button">${I18N.t("Kontext komprimieren")}</button></div></dialog>
-  <dialog id="work-settings-dialog"><div class="dialog-heading"><h2>${I18N.t("Optionen & Version")}</h2><button type="button" class="icon-button" data-feature-close aria-label="${I18N.t("Schließen")}">×</button></div><h3>${I18N.t("Benachrichtigungen")}</h3><label class="check-label"><input type="checkbox" id="enable-notifications"> ${I18N.t("Hinweise bei fertigen Aufgaben und Rückfragen")}</label><label class="check-label"><input type="checkbox" id="enable-sound"> ${I18N.t("Hinweiston")}</label><p id="notification-support" class="muted"></p><button type="button" class="subtle" id="reset-panel-sizes">${I18N.t("Panelgrößen zurücksetzen")}</button><hr><h3>Codex-Web</h3><div id="version-details"></div><button type="button" class="subtle" id="check-version">${I18N.t("Nach Updates suchen")}</button></dialog>
+  <dialog id="work-settings-dialog"><div class="dialog-heading"><h2>${I18N.t("Info")}</h2><button type="button" class="icon-button" data-feature-close aria-label="${I18N.t("Schließen")}">×</button></div><h3>Codex-Web</h3><div id="version-details"></div><button type="button" class="subtle" id="check-version">${I18N.t("Nach Updates suchen")}</button></dialog>
   <input type="file" id="attachment-picker" multiple hidden><input type="file" id="explorer-upload-picker" multiple hidden>
   `,
   );
@@ -968,12 +855,12 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
       toast(I18N.t("Kontextkomprimierung gestartet."));
     }
   });
-  const showOptions = () => {
-    F.renderPreferences();
+  const showInfo = () => {
     F.renderVersion();
     $("work-settings-dialog").showModal();
+    F.version(false).catch(() => {});
   };
-  $("version-button").onclick = showOptions;
+  $("version-button").onclick = showInfo;
   $("check-version").onclick = safe(async () => {
     $("check-version").disabled = true;
     try {
@@ -982,36 +869,6 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
       $("check-version").disabled = false;
     }
   });
-  for (const id of ["enable-notifications", "enable-sound"])
-    $(id).onchange = safe(async () => {
-      if (
-        id === "enable-notifications" &&
-        $(id).checked &&
-        globalThis.isSecureContext &&
-        globalThis.Notification &&
-        Notification.permission === "default"
-      )
-        await Notification.requestPermission();
-      if (id === "enable-sound" && $(id).checked) {
-        const Audio = globalThis.AudioContext || globalThis.webkitAudioContext;
-        if (Audio) {
-          F.audio ||= new Audio();
-          await F.audio.resume();
-        }
-      }
-      const result = await api(
-        "/api/workbench",
-        {
-          preferences: {
-            notifications: $("enable-notifications").checked,
-            sound: $("enable-sound").checked,
-          },
-        },
-        "PATCH",
-      );
-      F.preferences = result.preferences;
-      F.renderPreferences();
-    });
   document.addEventListener("keydown", (event) => {
     if (
       state.authenticated &&
@@ -1023,20 +880,8 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
       F.showSearch();
     }
   });
-  window.addEventListener("focus", () => {
-    F.notificationCount = 0;
-    document.title = "Codex-Web · VM Console";
-  });
   window.addEventListener("pagehide", () => {
     F.saveDraft().catch(() => {});
-  });
-  document.addEventListener("pointerdown", () => {
-    if (!F.preferences.sound) return;
-    const Audio = globalThis.AudioContext || globalThis.webkitAudioContext;
-    if (Audio) {
-      F.audio ||= new Audio();
-      F.audio.resume().catch(() => {});
-    }
   });
   // Persist widths per browser; the mobile layout continues to use its overlay panels.
   let widths = {};
@@ -1110,21 +955,13 @@ ${I18N.t("Zum Bestätigen den Namen eingeben.")}`,
       localStorage.setItem("codex.panel-widths", JSON.stringify(widths));
     };
   }
-  $("reset-panel-sizes").onclick = () => {
-    widths = {};
-    for (const key of ["sidebar", "tools"])
-      document.documentElement.style.removeProperty("--" + key + "-width");
-    localStorage.removeItem("codex.panel-widths");
-  };
   const observer = new MutationObserver(() => F.decoratePins());
   observer.observe($("thread-list"), { childList: true });
   observer.observe($("chat"), { childList: true });
   setInterval(() => {
     if (
       state.authenticated &&
-      ((state.view === "tasks" && !document.hidden) ||
-        F.preferences.notifications ||
-        F.preferences.sound)
+      (state.view === "tasks" && !document.hidden)
     )
       F.refreshTasks().catch(() => {});
   }, 10000);

@@ -1,6 +1,6 @@
 # Architecture
 
-[Deutsch](architecture.de.md) · [Full architecture guide](wiki/en-Architecture.md)
+[Deutsch](architecture.de.md)
 
 ## Components
 
@@ -8,17 +8,14 @@
 flowchart LR
     B[Browser] -->|Authenticated HTTP| W[Web server]
     W -->|Events via /events| B
-    W -->|JSON-RPC over WebSocket| G[Gateway]
-    G -->|WebSocket over Unix socket| C[Codex App Server]
+    W -->|JSON-RPC over WebSocket| C[External Codex App Server]
     C --> F[Projects and tools]
     W --> D[Web data volume]
 ```
 
 `server.mjs` serves HTML, JavaScript and CSS and authenticates control requests. The browser does not connect directly to the Codex host or hold OpenAI account credentials.
 
-`lib/bridge.mjs` maintains the shared native connection. It supports `ws://`, `wss://` and a local Unix control socket. `gateway.mjs` forwards network WebSocket traffic to that existing socket without changing messages. A compatible existing WebSocket endpoint can replace the gateway.
-
-One Docker image contains both entry points. Compose selects web server or gateway. The web container needs no Codex CLI, project-file mount or Docker socket. Codex account data and project files remain on the Codex host.
+`lib/bridge.mjs` maintains the shared connection to the external Codex App Server API over `ws://` or `wss://`. It authenticates with the configured bearer token when provided. The web container runs only the web client; it contains no Codex process and requires no project-file or Docker mounts.
 
 ## Request lifecycle
 
@@ -54,6 +51,10 @@ Native filesystem methods read and write files. Directory, Git, ZIP and manageme
 
 ## Origin and compatibility
 
-This project was built entirely with AI. Its UI, bridge, gateway, tests and configuration were written for this project. Official documentation and local protocol schemas informed the implementation. Another public web client's architecture was reviewed for context; no client source or UI assets were copied. The logo was also AI-generated; see the repository branding notes.
+This project was built entirely with AI. Its UI, bridge, tests and configuration were written for this project. Official documentation and local protocol schemas informed the implementation. Another public web client's architecture was reviewed for context; no client source or UI assets were copied. The logo was also AI-generated; see the repository branding notes.
 
 Compatibility is verified with Codex 0.166.0. Protocol changes require a new compatibility review. See the [official App Server documentation](https://learn.chatgpt.com/docs/app-server).
+
+## Project agents
+
+`lib/agents.mjs` lists native subagent threads for the selected project using `thread/list`, including archived threads. Their working directory must match the project. Agent output uses the same 20-entry history pages as chats and never resumes or starts agent work. `public/agents.js` provides filters, parent-chat links and periodic status/output refresh while the view is open. Runtime status is displayed as supplied; an unloaded agent is not guessed to be completed.

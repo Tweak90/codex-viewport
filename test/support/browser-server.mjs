@@ -7,6 +7,8 @@ const root = await mkdtemp(path.join(os.tmpdir(), "codex-web-browser-"));
 await mkdir(path.join(root, "home/.codex"), { recursive: true });
 const bridge = new FakeBridge(root);
 const app = await createConsoleServer({
+  environment: { ...process.env, CODEX_WEB_LANGUAGE: "de" },
+  releaseFetcher: async () => ({ ok: true, status: 200, json: async () => ({ tag_name: "v9.0.0", html_url: "https://github.com/example/codex-web/releases/tag/v9.0.0", published_at: "2026-11-05T12:00:00Z" }) }),
   bridge,
   dataDir: path.join(root, "data"),
   projectRoot: path.join(root, "home/projects"),

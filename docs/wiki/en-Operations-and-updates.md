@@ -33,22 +33,15 @@ docker compose -f compose.image.yml up -d
 
 `latest` is a moving tag. Pulling obtains its current image; the running container uses it after recreation. A fixed version tag stays on that release. Codex-Web's version check reads release metadata and does not deploy anything.
 
-Saved settings still override ENV after an update. Clear a field or choose **Use ENV** to restore environment precedence. Keep the volume to retain the password and preferences.
+Saved settings still override ENV after an update. Clear a field or choose **Use default** to restore environment precedence. Keep the volume to retain the password and preferences.
 
-## Update a source build or gateway
+## Update a source build
 
 ```bash
 git pull --ff-only
 docker compose up -d --build
 ```
 
-Update the gateway when needed:
-
-```bash
-docker compose -f compose.gateway.yml up -d --build
-```
-
-This recreates the gateway, not the independently running Codex daemon.
 
 ## Backups and restoration
 
@@ -65,8 +58,8 @@ docker compose -f compose.image.yml ps
 docker compose -f compose.image.yml logs --tail=100 web
 ```
 
-Use `-f compose.gateway.yml` and service `gateway` for its Compose logs. Review logs before sharing them.
+Review logs before sharing them.
 
-Public `/healthz` checks the web server; with a signed-in session it also reports Codex connection state. Gateway health checks only its own HTTP server.
+Public `/healthz` checks the web server; with a signed-in session it also reports Codex connection state.
 
 Releases include source, a Linux/amd64 Docker archive and `SHA256SUMS`. Verify checksums before importing a downloaded image. The release pipeline also publishes version tags and `latest` to GHCR.

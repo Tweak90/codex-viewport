@@ -1,6 +1,6 @@
 "use strict";
 globalThis.I18N = (() => {
-  let language = localStorage.getItem("codex.language") === "en" ? "en" : "de";
+  let language = localStorage.getItem("codex.language") === "de" ? "de" : "en";
   let english = {};
   const texts = [], attributes = [], capturedTexts = new WeakSet(), capturedElements = new WeakSet();
   const t = (text) => {

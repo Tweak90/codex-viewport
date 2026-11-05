@@ -172,7 +172,7 @@ function setConnection(status) {
     status.connected || !status.error,
   );
   $("connection-error").textContent = status.error
-    ? `${I18N.t("Codex nicht erreichbar:")} ${status.error}${I18N.t(". Die Verbindung wird automatisch erneut versucht.")}`
+    ? `${I18N.t("Codex nicht erreichbar:")} ${I18N.t(status.error)}${I18N.t(". Die Verbindung wird automatisch erneut versucht.")}`
     : "";
   updateComposer();
   if (reconnected) boot().catch((error) => toast(error.message));
@@ -370,6 +370,7 @@ function chooseProject(project, view) {
     refreshTool().catch((e) => toast(e.message));
 }
 function clearChat(view) {
+  globalThis.codexAgents?.leave();
   globalThis.codexQuestions?.leave();
   globalThis.codexQueue?.leave();
   globalThis.codexFeatures?.leaveChat();
@@ -432,6 +433,7 @@ async function newChat(projectId) {
 async function openThread(id, options = {}) {
   if (state.pendingSend) return toast(I18N.t("Der Auftrag wird gerade übermittelt."));
   if (!canLeaveEditor()) return;
+  globalThis.codexAgents?.leave();
   globalThis.codexQuestions?.leave();
   globalThis.codexQueue?.leave();
   globalThis.codexFeatures?.leaveChat();
@@ -646,6 +648,8 @@ function updateComposer() {
             ? "projects"
             : state.view === "gallery"
               ? "images"
+              : state.view === "agents"
+                ? null
               : "chat"),
     );
   globalThis.codexFeatures?.updateContext();
@@ -803,6 +807,7 @@ function scheduleChat() {
     }, 75);
 }
 function handleEvent(message) {
+  globalThis.codexAgents?.handleEvent(message);
   globalThis.codexFeatures?.handleEvent(message);
   globalThis.codexQuestions?.handleEvent(message);
   globalThis.codexQueue?.handleEvent(message);
@@ -817,10 +822,7 @@ function handleEvent(message) {
   }
   if (method === "account/rateLimits/updated") {
     if (state.usage) state.usage.rateLimits = p.rateLimits;
-    const window = p.rateLimits?.primary;
-    if (window)
-      $("usage-summary").textContent =
-        `${Math.max(0, Math.round(100 - window.usedPercent))}${I18N.t("% frei")}`;
+    updateUsageSummary({ rateLimits: p.rateLimits });
     return;
   }
   if (method === "console/status") return setConnection(p);
@@ -949,7 +951,7 @@ function itemHtml(item) {
     return `<article class="message user"><div class="message-label">${I18N.t("Du")}</div><div class="message-body">${escapeHtml(text)}${itemImageCards(item)}</div></article>`;
   }
   if (item.type === "agentMessage" || item.type === "plan")
-    return `<article class="message assistant"><div class="message-label"><img class="avatar" src="/assets/logo.png" alt=""> ${item.type === "plan" ? "Plan" : "Codex"}</div><div class="message-body">${outputPreview(item.text || "", item.id, true)}${itemImageCards(item, md(item.text || ""))}${globalThis.codexQuestions?.cards(item) || ""}</div></article>`;
+    return `<article class="message assistant"><div class="message-label"><img class="avatar" src="/assets/logo.png?v=blue-terminal" alt=""> ${item.type === "plan" ? "Plan" : "Codex"}</div><div class="message-body">${outputPreview(item.text || "", item.id, true)}${itemImageCards(item, md(item.text || ""))}${globalThis.codexQuestions?.cards(item) || ""}</div></article>`;
   let title, text;
   if (item.type === "reasoning") {
     title = I18N.t("Überlegt");
@@ -1418,6 +1420,7 @@ function toggleTheme() {
   applyTheme(state.theme === "dark" ? "light" : "dark");
 }
 function showAuth(info) {
+  globalThis.codexAgents?.leave();
   globalThis.codexQuestions?.logout();
   globalThis.codexQueue?.leave();
   state.returnChat = null;
@@ -1431,6 +1434,8 @@ function showAuth(info) {
   state.projects = [];
   state.turns = [];
   state.media = [];
+  state.usage = null;
+  updateUsageSummary(null);
   state.thread = null;
   state.requests.clear();
   $("thread-list").replaceChildren();
@@ -1889,7 +1894,8 @@ $("chat").onclick = safe(async (event) => {
     const id = expand.dataset.expandOutput;
     if (state.expandedOutputs.has(id)) state.expandedOutputs.delete(id);
     else state.expandedOutputs.add(id);
-    renderChat();
+    if (state.view === "agents") globalThis.codexAgents?.renderOutput();
+    else renderChat();
     return;
   }
   if (target.matches("[data-archive-select]")) {
@@ -2032,6 +2038,7 @@ $("picker-list").onclick = safe(async (e) => {
     const project = state.projects.find((p) => p.id === b.dataset.pickProject);
     if (!project) return;
     if (pickerView === "gallery") return showGallery(project.id);
+    if (pickerView === "agents") return globalThis.codexAgents?.show(project);
     if (!canLeaveEditor()) return;
     chooseProject(project.path, pickerView === "chat" ? "chats" : "project");
     if (["files", "git", "terminal"].includes(pickerView))
@@ -2405,6 +2412,7 @@ async function activateView(view) {
   if (state.pendingSend) return toast(I18N.t("Der Auftrag wird gerade übermittelt."));
   const project = selectedProject();
   if (!project) return showProjectPicker(null, view);
+  if (view === "agents") return globalThis.codexAgents?.show(project);
   if (view === "gallery") return showGallery(project.id);
   if (view === "project") return chooseProject(project.path);
   if (state.returnChat?.project === project.path)
@@ -2562,16 +2570,27 @@ $("chat").addEventListener(
       await showGallery(state.mediaProjectId);
   }),
 );
+function updateUsageSummary(usage) {
+  const buckets = Object.values(usage?.rateLimitsByLimitId || {});
+  const limits = usage?.rateLimits || usage?.rateLimitsByLimitId?.codex || (buckets.length === 1 ? buckets[0] : null);
+  const windows = [limits?.primary, limits?.secondary].filter(Boolean);
+  const remaining = (window) => Number.isFinite(window?.usedPercent)
+    ? `${Math.round(Math.min(100, Math.max(0, 100 - window.usedPercent)))}%` : "—";
+  const fiveHours = windows.find((window) => window.windowDurationMins === 300);
+  const weekly = windows.find((window) => window.windowDurationMins === 10080);
+  $("activity-usage-primary").textContent = remaining(fiveHours);
+  $("activity-usage-weekly").textContent = remaining(weekly);
+  const primary = remaining(limits?.primary);
+  $("usage-summary").textContent = primary === "—" ? "" : primary.slice(0, -1) + I18N.t("% frei");
+}
 async function refreshUsageSummary() {
   state.usageFetch ||= api("/api/usage").finally(() => {
     state.usageFetch = null;
   });
   const usage = await state.usageFetch;
+  if (!state.authenticated) return usage;
   state.usage = usage;
-  const primary = usage.rateLimits?.primary;
-  $("usage-summary").textContent = primary
-    ? `${Math.max(0, Math.round(100 - primary.usedPercent))}${I18N.t("% frei")}`
-    : "";
+  updateUsageSummary(usage);
   return usage;
 }
 function durationLabel(minutes) {

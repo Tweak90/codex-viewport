@@ -8,7 +8,7 @@
 | --- | --- |
 | Laufzeit | Node.js ab Version 22, ES-Module |
 | Webserver | Node `http`, Authentifizierung und eigene REST-Endpunkte |
-| Transport | `ws` für WebSocket und WebSocket über Unix-Socket |
+| Transport | `ws` für die externe WebSocket-API |
 | Oberfläche | HTML, CSS, JavaScript ohne Frontend-Framework |
 | Markdown | `marked` zum Rendern, DOMPurify zum Bereinigen |
 | Passwortschutz | Node `crypto`, scrypt und zufällige Sitzungstickets |
@@ -25,7 +25,6 @@ Die konkreten npm-Versionen stehen in `package.json` und `package-lock.json`. Es
 | Datei | Verantwortung |
 | --- | --- |
 | `server.mjs` | HTTP-Server, Anmeldung, Browser-API und Ereignisse |
-| `gateway.mjs` | Netzwerkzugang zum vorhandenen Control-Socket |
 | `lib/settings.mjs` | Gespeicherte Overrides, ENV-Vorrang und Validierung |
 | `lib/message-queue.mjs` | Native Warteschlange und einmalige Startversuche |
 | `lib/questions.mjs` | Asynchrone Rückfragen und Versandstatus |
@@ -48,10 +47,10 @@ Die konkreten npm-Versionen stehen in `package.json` und `package-lock.json`. Es
 
 ```bash
 npm ci
-CODEX_SOCKET="$HOME/.codex/app-server-control/app-server-control.sock" npm start
+CODEX_WS_URL=ws://codex-host.example:4500 npm start
 ```
 
-Alternativ `CODEX_WS_URL` und bei Bedarf `CODEX_API_TOKEN` für einen vorhandenen API-Endpunkt setzen. Private Werte gehören in die eigene Umgebung, nicht in eingecheckte Beispieldateien.
+`CODEX_API_TOKEN` bei Bedarf über die eigene Umgebung für die externe API setzen. Private Werte gehören nicht in eingecheckte Beispieldateien.
 
 ## Tests
 
@@ -71,7 +70,6 @@ Die Browserprüfungen starten einen eigenen mockbasierten Server und temporäre 
 
 ```bash
 docker compose --env-file .env.example config --quiet
-docker compose --env-file .env.example -f compose.gateway.yml config --quiet
 docker build -t codex-vm-console:dev .
 ```
 
@@ -92,3 +90,5 @@ git -C ../codex-web.wiki push
 Das Wiki-Repository muss außerhalb der Anwendung oder in einem ignorierten lokalen Verzeichnis liegen. Das Exportskript entfernt die `.md`-Endung aus internen Wiki-Seitenlinks; im Hauptrepository bleiben sie als normale Dateilinks nutzbar.
 
 README, Changelog und Release-Notizen besitzen englische und deutsche Fassungen. Die Wiki-Startseite verweist auf `en-Home.md` beziehungsweise `de-Home.md`. Beide Sprachen müssen bei Verhaltensänderungen mitgepflegt werden. UI-Übersetzungen betreffen eigene Bedienelemente; Nachrichten, Dateinamen und Projektinhalte werden nicht umgeschrieben.
+
+`lib/agents.mjs` und `public/agents.js` ergänzen projektbezogene Agent-Listen und lesenden Zugriff auf Ausgaben. Die Einstellungen verwenden drei Bereiche mit tastaturbedienbaren Reitern und dauerhaft sichtbaren Aktionen. Auswahloptionen übernehmen die Theme-Farben auch im geöffneten Menü.

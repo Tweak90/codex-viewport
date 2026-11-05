@@ -8,7 +8,7 @@
 
 Das Browserpasswort schützt die Steuerungs-API, Bilder und Ereignisse. Es wird als gesalzener scrypt-Hash gespeichert. Sitzungen verwenden zufällige Tickets; serverseitig liegen ihre Hashes. Mutierende Browseraufrufe benötigen einen CSRF-Token und werden auf Herkunft geprüft.
 
-Der Gateway besitzt einen eigenen optionalen Bearer-Token. In `compose.image.yml` ist dieser erforderlich. Eine App-Sitzung und der Gateway-Token sind unterschiedliche Zugänge.
+Die externe Codex-API kann einen eigenen Bearer-Token verlangen. Eine App-Sitzung und der API-Token sind unterschiedliche Zugänge.
 
 Gespeicherte API-Token und GitHub-Token stehen nur in `settings.json` im geschützten Web-Volume und werden in API-Antworten nicht offengelegt. Wer das Webpasswort kennt, kann die gemeinsamen Instanzeinstellungen ändern.
 
@@ -31,7 +31,6 @@ Die endgültige Löschung hat keinen Papierkorb. Das Entfernen eines Anhangs aus
 | ZIP-Erstellung | Höchstens 5.000 Dateien und 100 MB unkomprimierter Inhalt |
 | Galerie | Höchstens 2.000 Bilder pro Projekt |
 | Suchergebnisse | Höchstens 100 angezeigte Treffer; Gesamtzahl und Indexfortschritt werden angezeigt |
-| Desktop-Hinweise | Geöffnete Oberfläche, Browserberechtigung und HTTPS oder localhost |
 | App-Server-Kompatibilität | Verifiziert mit Codex 0.166.0 |
 
 Modellverfügbarkeit, Kontingente und Rücksetzungsrechte stammen aus der vorhandenen Codex-Anmeldung. Die Oberfläche erfindet keine fehlenden Kontingentwerte. Bestimmte Freigaben können weiterhin an den Client gebunden sein, der den Auftrag ursprünglich gestartet hat.

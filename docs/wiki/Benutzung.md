@@ -10,7 +10,7 @@ Die Seitenleiste enthält Projekte, Archiv, Kontingente und die Chatsuche. **Neu
 - **Chat**: Chatliste mit **Neuen Chat starten** oberhalb der vorhandenen Chats. Der Reiter legt keinen Chat an. Beim Wechsel zwischen Übersicht, Bildern und Chat innerhalb desselben Projekts kehrt er zum zuletzt geöffneten Chat zurück. Ein Projektwechsel setzt diese Rückkehr zurück.
 - **Bilder**: Galerie des ausgewählten Projekts.
 
-Die obere Aktionsleiste bietet Kontext, Darstellungswechsel und Abmelden. Dateien, lesende Git-Ansicht und Konsole sind in der Werkzeugleiste erreichbar; auf Mobilgeräten im aufklappbaren Seitenmenü. Das Zahnrad links öffnet **Einstellungen** mit Sprache, Eingabeverhalten und Anwendungskonfiguration. Benachrichtigungen und Versionsinformationen sind von dort sowie über die Versionsanzeige erreichbar.
+Die obere Aktionsleiste bietet Kontext, Darstellungswechsel und Abmelden. Dateien, lesende Git-Ansicht und Konsole sind in der Werkzeugleiste erreichbar; auf Mobilgeräten im aufklappbaren Seitenmenü. Das Zahnrad links öffnet **Einstellungen** mit Sprache, Eingabeverhalten und Anwendungskonfiguration. Der Info-Dialog mit Versionsinformationen ist von dort sowie über die Versionsanzeige erreichbar.
 
 ## Projekte
 
@@ -66,3 +66,15 @@ Die Volltextsuche erfasst Nachrichten und Aktivitäten einschließlich Archiv, w
 **Aufgaben** zeigt laufende und zuletzt bearbeitete Chats mit Status, Laufzeit, Fehlern und Stoppen. Optionale Hinweise und Ton gelten bei geöffneter Oberfläche.
 
 **Kontingente** zeigt die von Codex gelieferten Nutzungsfenster und verfügbaren Rücksetzungen. Eine Rücksetzung wird nur nach ausdrücklicher Bestätigung angefordert. Die Kontextanzeige beschreibt dagegen Tokens im Chatkontext und beobachtete Komprimierungen; sie ist kein Kontingentmesser.
+
+## Agents
+
+Der Reiter **Agents** zeigt aktive und bisherige Unteragenten des ausgewählten Projekts. Statusfilter und Suche grenzen Name, Rolle und Auftrag ein. Ein Agent öffnet seine Ausgaben, Befehle und Werkzeugergebnisse. Zunächst werden die letzten 20 Einträge geladen; **Ältere Ausgaben laden** zeigt den früheren Verlauf. **Übergeordneten Chat öffnen** führt zur Unterhaltung, die den Agent gestartet hat. Status und gespeicherte Ausgaben werden während der Anzeige aktualisiert. Beim Lesen wird kein Auftrag gestartet oder fortgesetzt.
+
+**Nicht geladen** ist ein nativer Laufzeitstatus und kein Nachweis eines erfolgreichen Abschlusses. Archivierte Agents bleiben mit gespeichertem Verlauf lesbar. Agents mit dem Arbeitsverzeichnis eines anderen Projekts werden getrennt angezeigt.
+
+## Info und Kontingent-Kurzanzeige
+
+**Info** zeigt die installierte Version. **Nach Updates suchen** liest nur GitHub-Releases; eine neue Version wird mit Versionsnummer und Veröffentlichungsdatum angezeigt. Docker-Zugriff und Installation sind dafür nicht nötig. Benachrichtigungen, Hinweiston und eine Schaltfläche zum Zurücksetzen der Panelgrößen gehören nicht zum Dialog.
+
+Unter dem Kontingent-Symbol der schmalen Aktivitätsleiste zeigt der obere Prozentwert das verbleibende 5-Stunden-Kontingent, der untere das verbleibende Wochenkontingent. Fehlende Daten erscheinen als Strich; Werte werden nicht erfunden. Ein Klick öffnet die vollständige Kontingentanzeige.

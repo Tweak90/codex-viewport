@@ -2,11 +2,25 @@
 
 [Deutsch](CHANGELOG.de.md)
 
+## 1.0.1 — 2026-11-05
+
+- English and sensible application defaults when ENV is absent; explicit environment/source markers and saved overrides.
+- Info replaces the options dialog; notification/sound controls and the panel reset action are removed.
+- Update checks read public GitHub releases anonymously from the web container, with version and release date; no host commands or Docker access.
+- Activity-bar allowance shortcut displays only remaining 5-hour and weekly percentages.
+- Settings appear only in the left sidebar, above usage limits, with General, Codex and Updates categories.
+- Clear field descriptions, collapsible ENV details, keyboard navigation and a fixed Save/Cancel footer preserve edits across categories.
+- Codex-Web connects exclusively to the external WebSocket API; local transport, host-side launch tools and their configuration/examples were removed. Retired saved settings migrate automatically.
+- Project Agents tab shows active and previous agents, archived histories, search/status filters, parent chats and paginated output without starting work.
+- New blue terminal logo has a transparent background throughout the UI, chat, favicon and documentation; cached UI references refresh automatically.
+- Open select menus use readable foreground/background colors in both themes.
+- German/English README, Wiki, architecture and installation guides match the external-API setup.
+
 ## 1.0.0 — 2026-11-05
 
 First release of the independent Codex-Web browser interface.
 
-- Existing Codex App Server connection using WebSocket or a local Unix control socket.
+- Connection to an existing Codex App Server API.
 - Password sign-in, projects with real folders, multiple chats, archive, search and saved drafts.
 - German and English UI, light/dark themes and responsive IDE layout.
 - Gear settings with saved-value precedence over ENV, configurable Enter keys and steer/queue follow-ups.

@@ -1,41 +1,58 @@
 # Architektur
 
-## Aufteilung
+[English](architecture.md)
 
-`server.mjs` liefert die eigene Browseroberfläche aus. Er hält eine gemeinsame Verbindung zum Codex-Dienst; Browser erhalten dessen Ereignisse über `/events` und senden API-Aufträge über `/api/rpc`. Projektverknüpfungen liegen als JSON im Docker-Volume. Browser halten keine OpenAI-Anmeldedaten.
+## Komponenten
 
-`lib/bridge.mjs` implementiert das dokumentierte JSON-RPC-Protokoll. Antworten werden anhand ihrer IDs dem Aufruf zugeordnet. Freigabeanfragen von Codex behalten ihre ursprüngliche ID. Aufträge werden bei Verbindungsfehlern abgewiesen und **nicht wiederholt**. Jede Verbindung hat eine eigene Generation; verspätete Nachrichten einer alten Verbindung werden verworfen. Nach einem Neuaufbau werden beobachtete Chats vor dem Bereitschaftssignal wieder abonniert. WebSocket-Pings erkennen Verbindungsabbrüche.
+```mermaid
+flowchart LR
+    B[Browser] -->|Angemeldete HTTP-Aufrufe| W[Webserver]
+    W -->|Ereignisse via /events| B
+    W -->|JSON-RPC über WebSocket| C[Externer Codex App Server]
+    C --> F[Projektdateien und Werkzeuge]
+    W --> D[Web-Datenvolume]
+```
 
-`GET /api/chats/:id/history` liefert über `lib/history.mjs` höchstens 20 gespeicherte Einträge je Seite. Die native Abfrage `thread/items/list` läuft absteigend mit einem Fortsetzungs-Cursor; `thread/turns/list` mit `itemsView: notLoaded` ergänzt nur Status-Metadaten. Diese werden begrenzt zwischengespeichert. Generierte Bildinhalte bleiben im Codex-Speicher und werden über den Bild-Endpunkt abgerufen. Für Speicher ohne Item-Paginierung wird jeweils ein einzelner Arbeitsdurchlauf geladen und innerhalb seiner Einträge weitergeblättert; `thread/read` mit vollständigem Verlauf wird nicht verwendet. Die nativen Methoden beschreibt die [offizielle OpenAI-Dokumentation](https://learn.chatgpt.com/docs/app-server).
+`server.mjs` liefert HTML, JavaScript und CSS aus. Steuerungsanfragen laufen authentifiziert über den Webserver. Der Browser verbindet sich nicht direkt mit dem Codex-Host und hält keine OpenAI-Anmeldedaten.
 
-Der Browser öffnet Chat-Metadaten lesend und zeigt die erste Verlaufsseite unabhängig von `thread/resume`. Die Verbindung für Live-Ereignisse wird parallel hergestellt; Senden wartet auf deren Erfolg. Archivierte Chats werden nicht fortgesetzt. Ein Anfrage- und Ansichtswechselzähler verwirft verspätete Seiten. Beim Voranstellen älterer Einträge wird ein sichtbarer Eintrag als Scrollanker erhalten; Seiten desselben Arbeitsdurchlaufs werden anhand ihrer Item-IDs zusammengeführt.
+`lib/bridge.mjs` hält die gemeinsame Verbindung zur externen Codex-App-Server-API über `ws://` oder `wss://`. Ein konfigurierter Bearer-Token wird beim Verbindungsaufbau übertragen. Der Web-Container enthält nur den Webclient, keinen Codex-Prozess und keine Projektdatei- oder Docker-Mounts.
 
-`gateway.mjs` läuft auf der KI-VM und überträgt WebSocket-Nachrichten unverändert zum Control-Socket des bereits laufenden Codex-Daemons. Es führt selbst keine Projektbefehle aus. Der optionale Bearer-Token wird beim WebSocket-Handshake geprüft. Ein Docker-Image enthält beide Rollen; Compose startet jeweils den passenden Einstiegspunkt.
+## Ein Auftrag vom Browser bis zum Modell
 
-Alle Projektpfade beziehen sich auf die KI-VM. Der Dateibrowser benutzt `fs/readDirectory`, `fs/readFile` und `fs/writeFile`; Git und Konsole benutzen `command/exec`. So bleiben die Projektverzeichnisse ausschließlich auf dem Codex-Host.
+1. Der Benutzer öffnet oder erstellt einen Chat innerhalb eines Projekts.
+2. Ein leerer Chat wird zunächst als Web-Entwurf gespeichert.
+3. Beim ersten Senden wird über `thread/start` der native Verlauf angelegt.
+4. `turn/start` übermittelt Text und gegebenenfalls Bildpfade; weitere Anweisungen verwenden je nach Einstellung `turn/steer` oder die native Warteschlange.
+5. Ereignisse aktualisieren Nachrichten, Aktivitäten, Aufgaben und Rückfragen.
+6. Freigaben und Antworten werden mit der ursprünglichen Anfrage-ID zurückgeschickt.
+7. Abschließende Ereignisse ergänzen Verlauf und Status.
 
-## Laufzeiten und Grenzen
+Der Browser kann geschlossen werden, während Codex auf dem Host weiterarbeitet.
 
-Eine Passwortanmeldung schützt alle Steuerungs-APIs, Bilddateien und den Ereignis-WebSocket. `auth.json` enthält einen gesalzenen scrypt-Hash; Sitzungen werden über zufällige HttpOnly-Cookies identifiziert, serverseitig nur gehasht gespeichert und bei mutierenden Aufrufen durch einen CSRF-Token ergänzt. Die Ersteinrichtung setzt kein Standardpasswort.
+## Verbindung und Fehler
 
-`lib/projects.mjs` verwaltet stabile Projekt-IDs, Projektpfade, Chat-Zuordnungen und leere Chat-Entwürfe. Historische Desktop-Chats werden beim Auflisten anhand ihres Arbeitsverzeichnisses zugeordnet. Ein gelöschtes Projekt taucht durch alte Chats nicht automatisch wieder auf. Die Ordnerlöschung läuft erst nach Namensbestätigung und Prüfung auf laufende Aufgaben, geschützte Pfade und enthaltene weitere Projekte.
+RPC-Antworten werden anhand ihrer IDs zugeordnet. Jede Transportverbindung besitzt eine Generation; verspätete Antworten älterer Verbindungen werden verworfen. WebSocket-Pings erkennen unterbrochene Verbindungen. Offene Aufrufe werden bei einem Abbruch abgewiesen, nicht erneut abgesendet. Nach der Wiederverbindung werden beobachtete Chats erneut abonniert.
 
-`lib/media.mjs` indexiert Bilddateien im Projekt, im Codex-Verzeichnis für generierte Bilder und anhand der gespeicherten Bildpfade aus Chatverläufen. Bilddaten werden über die authentifizierte Weboberfläche vom App-Server gelesen. Es wird kein zusätzlicher Dateiserver auf der KI-VM benötigt.
+Das ist kein automatisches Wiederholen eines Arbeitsauftrags. Bei einem unklaren Ergebnis muss zunächst der bestehende Verlauf geprüft werden.
 
-Der Codex-Daemon lebt unabhängig von Browser, Web-Container und Gateway. Ein geschlossener Browser stoppt keine Agentenaufgabe. Beim Neustart des Web-Containers bleiben Chatdaten und Aufgaben auf der KI-VM erhalten; der Browser öffnet den betreffenden Chat erneut. Verbindungsspezifische Freigaben können nach einem vollständigen Verbindungswechsel vom ursprünglichen Client abhängen. Standalone-Konsolenbefehle haben ein Zeitlimit von zehn Minuten und sind keine dauerhaften Hintergrundjobs.
+## Große Verläufe und Bilder
 
-Die Weboberfläche bietet die implementierten API-Funktionen, keine vollständige Nachbildung aller Ansichten der offiziellen Codex-App. Computer-Use-Ansichten und eingebettete MCP-Plugin-Oberflächen sind nicht enthalten. Für unbekannte Rückfragetypen steht ein JSON-Antwortfeld zur Verfügung.
+`lib/history.mjs` liefert höchstens 20 gespeicherte Einträge pro Seite. `thread/items/list` liest Einträge, `thread/turns/list` ergänzt begrenzte Status-Metadaten. Ein Kompatibilitätsweg liest bei älteren Speichern einzelne Arbeitsdurchläufe statt des gesamten Chats.
 
-## Technische Recherche
+Generierte Bilddaten werden aus diesen Seiten entfernt und gesondert über den authentifizierten Bild-Endpunkt geladen. Im Browser bleiben bereits angezeigte Bilder bei weiteren Ausgaben erhalten. Anfragen sind an die jeweilige Ansicht gebunden; verspätete Ergebnisse ersetzen keinen inzwischen ausgewählten Chat oder ein anderes Projekt.
 
-Als Grundlage dient die [offizielle App-Server-Dokumentation](https://learn.chatgpt.com/docs/app-server) zusammen mit den aus der installierten Codex-Version generierten Protokollschemata.
+## Datei- und Projektaktionen
 
-Ergänzend wurden die README und Architekturbeschreibung von [0-99/codex-web-docker](https://github.com/0-99/codex-web-docker) gelesen. Nützliche Themen im Vergleich waren die Trennung von Web-Frontend und langlebigem App-Server, Verbindungsgenerationen, die Behandlung offener Requests und explizite Versionskompatibilität. Es wurden keine Quelldateien, Patches, Desktop-Bundles oder UI-Assets daraus übernommen. Unsere Oberfläche, Bridge, Gateway, Tests und Docker-Konfiguration wurden eigenständig implementiert.
+Native Dateischnittstellen übernehmen Lesen und Schreiben. Verzeichnis-, Git-, ZIP- und Verwaltungsaktionen verwenden zusätzlich `command/exec` auf dem Codex-Host. Python prüft kanonische Projektpfade und schützt separat verwaltete Unterprojekte. Größere Dateiübertragungen laufen in Blöcken unterhalb der Nachrichtengrenzen. Temporäre ZIP- und Upload-Dateien werden nach Abschluss entfernt.
 
-## Workbench-Daten
+## Herkunft und Kompatibilität
 
-`lib/workbench.mjs` speichert Pins, Nachrichtenentwürfe, Benachrichtigungseinstellungen, beobachtete Aufgaben und Kontextwerte atomar in `workbench.json`. `lib/search.mjs` baut beim Suchen einen dauerhaften Index aus paginierten Chat-Einträgen auf; Treffer enthalten den Cursor der passenden Verlaufsseite. Binäre Bilddaten werden nicht indexiert. Archivstatus und ausdrückliche Projektzuordnungen werden bei der Suche berücksichtigt.
+Das Projekt wurde vollständig mit KI entwickelt. Oberfläche, Bridge, Tests und Konfiguration wurden für dieses Projekt erstellt. Zur Recherche wurden die offizielle API-Dokumentation und Protokollschemata der installierten Codex-Version verwendet. Die Architektur eines anderen öffentlichen Codex-Web-Projekts wurde zur Einordnung gelesen; daraus wurden keine Quellcodedateien oder UI-Assets übernommen. Das Logo ist ebenfalls KI-generiert; Details stehen in der Branding-Dokumentation des Repositorys.
 
-`lib/files.mjs` führt Dateiaktionen und ZIP-Erstellung auf der KI-VM aus. Pfade werden gegen den kanonischen Projektpfad geprüft; separat verwaltete Unterprojekte bleiben geschützt. Uploads nutzen binäre HTTP-Anfragen und die native Dateischnittstelle. Download-ZIPs werden temporär erstellt und anschließend entfernt.
+Verifiziert ist Codex 0.166.0. Änderungen am App-Server-Protokoll erfordern eine erneute Kompatibilitätsprüfung. Die [offizielle Dokumentation](https://learn.chatgpt.com/docs/app-server) beschreibt den App Server und seine Transportschnittstellen.
 
-`lib/work-routes.mjs` bündelt die authentifizierten Workbench-Endpunkte. `public/features.js` ergänzt Entwürfe, Uploads, Suche, Aufgaben, Kontextwerte, Projektvorgaben und Versionsinformationen, ohne die bisherigen Chat-Ansichten zu ersetzen. GitHub-Releases werden lesend über die vorhandene gh-Anmeldung auf der KI-VM oder einen optionalen serverseitigen Token geprüft. Der Web-Container bekommt keinen Docker-Socket und löst keine Deployments aus.
+Gespeicherte Einstellungen überschreiben ENV-Werte, solange sie nicht leer sind. Rückfrageantworten und Warteschlangenstarts speichern den Versandstatus vor dem Aufruf. Unbestätigte mutierende Aufrufe werden nicht erneut gesendet. Die Galerie fasst identische Dateien per SHA-256 zusammen und lässt interne Runtime-/Audit-Verzeichnisse aus.
+
+## Projekt-Agents
+
+`lib/agents.mjs` listet native Unteragenten des gewählten Projekts über `thread/list`, einschließlich archivierter Verläufe. Ihr Arbeitsverzeichnis muss zum Projekt passen. Ausgaben verwenden dieselben Verlaufsseiten mit 20 Einträgen wie Chats; beim Lesen wird kein Agent fortgesetzt oder gestartet. `public/agents.js` ergänzt Filter, Verknüpfungen zum übergeordneten Chat und regelmäßige Aktualisierung von Status und Ausgaben während der Anzeige. Der Laufzeitstatus wird unverändert dargestellt; ein nicht geladener Agent gilt nicht automatisch als abgeschlossen.

@@ -8,7 +8,7 @@ Codex-Web is a self-hosted browser interface for an existing Codex App Server. T
 
 ## Install and use
 
-1. [Installation](en-Installation.md): Codex host, API gateway and Docker web container.
+1. [Installation](en-Installation.md): external Codex API and Docker web container.
 2. [Configuration](en-Configuration.md): environment variables, settings, password and networking.
 3. [Usage](en-Usage.md): projects, chats, questions, attachments and tools.
 4. [Operation and updates](en-Operations-and-updates.md): persistent data, backups and Docker updates.

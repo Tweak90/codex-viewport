@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/Tweak90/codex-web/main/public/assets/logo.png" width="112" alt="Codex-Web logo"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/Tweak90/codex-web/main/public/assets/logo.png?v=blue-terminal" width="112" alt="Codex-Web logo"></p>
 
 # Codex-Web Wiki
 

@@ -13,6 +13,7 @@ Codex-Web's browser API is separate from the native App Server protocol. The web
 | `/api/state` | Connection and project state |
 | `/api/rpc` | Explicitly allowed native methods |
 | `/api/projects` | Project management |
+| `/api/projects/:id/agents`, `/agents/:agentId` | Project-scoped agent lists and paginated, read-only output |
 | `/api/projects/:id/files`, `/uploads`, `/download`, `/media` | Files, attachments and gallery |
 | `/api/chats/:id/history` | Paged history |
 | `/api/chats/:id/questions` | Async questions and one-shot replies |
@@ -49,7 +50,7 @@ Follow-ups can use `thread/queue/add` and `thread/queue/list`. The web server st
 | Web volume: `questions.json` | Question prompts, options and delivery state |
 | Web volume: `message-queue.json` | Queue ownership, paused threads and start claims |
 | Web volume: `projects.json` | IDs, paths, assignments, defaults and empty chat drafts |
-| Web volume: `workbench.json` | Pins, input drafts, notices, tasks and context values |
+| Web volume: `workbench.json` | Pins, input drafts, tasks and context values |
 | Web volume: `search-index.json` | Searchable text and history locations |
 | Codex host | Native chats, sign-in, tools and project files; submitted answers and queued input |
 | Project: `.codex-web/uploads/` | Uploaded attachments |

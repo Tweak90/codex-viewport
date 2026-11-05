@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1e1e1e" />
     <title>Codex-Web · VM Console</title>
-    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="icon" type="image/png" href="/assets/logo.png?v=blue-terminal" />
     <link rel="stylesheet" href="/style.css" />
     <script defer src="/vendor/marked.js"></script>
     <script defer src="/vendor/purify.js"></script>
@@ -15,11 +15,12 @@
     <script defer src="/settings.js"></script>
     <script defer src="/questions.js"></script>
     <script defer src="/queue.js"></script>
+    <script defer src="/agents.js"></script>
   </head>
   <body>
     <section id="auth-screen" class="auth-screen">
       <form id="auth-form" class="auth-card">
-        <img src="/assets/logo.png" width="72" height="72" alt="Codex-Web" />
+        <img src="/assets/logo.png?v=blue-terminal" width="72" height="72" alt="Codex-Web" />
         <div class="eyebrow">DEINE PROJEKTE. DEINE KONTROLLE.</div>
         <h1 id="auth-title">Willkommen bei Codex-Web</h1>
         <p id="auth-description">Anmeldung wird geladen …</p>
@@ -112,23 +113,21 @@
         <button
           type="button"
           data-activity="usage"
-          class="activity-bottom"
+          class="activity-bottom activity-quota"
           title="Kontingente"
           aria-label="Kontingente"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 19V9m8 10V4m8 15v-6" />
           </svg>
-        </button>
-        <button type="button" id="activity-settings" title="Einstellungen" aria-label="Einstellungen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg>
+          <span class="activity-quota-values" aria-hidden="true"><span id="activity-usage-primary" title="5-Stunden-Kontingent">—</span><span id="activity-usage-weekly" title="Wochenkontingent">—</span></span>
         </button>
       </nav>
       <aside class="sidebar" id="sidebar">
         <a class="brand" href="/" aria-label="Codex-Web Startseite"
           ><img
             class="brand-logo"
-            src="/assets/logo.png"
+            src="/assets/logo.png?v=blue-terminal"
             width="44"
             height="44"
             alt=""
@@ -149,12 +148,12 @@
         <button id="open-archive" class="archive-nav" type="button">
           ▣ <span>Archiv</span><span id="archive-count"></span>
         </button>
-        <button id="open-usage" class="archive-nav" type="button">
-          ◷ <span>Kontingente</span><span id="usage-summary"></span>
-        </button>
         <button id="open-settings" class="archive-nav" type="button">
           <svg class="settings-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg>
           <span>Einstellungen</span>
+        </button>
+        <button id="open-usage" class="archive-nav" type="button">
+          ◷ <span>Kontingente</span><span id="usage-summary"></span>
         </button>
         <button id="open-questions" class="archive-nav hidden" type="button">? <span>Rückfragen</span><span id="question-count"></span></button>
         <div class="section-label conversations-label">
@@ -253,6 +252,7 @@
           <button type="button" data-view-tab="project">▧ Übersicht</button>
           <button type="button" data-view-tab="chat">⌘ Chat</button>
           <button type="button" data-view-tab="gallery">▧ Bilder</button>
+          <button type="button" data-view-tab="agents">♧ Agents</button>
         </nav>
         <div class="workspace">
           <main class="conversation">

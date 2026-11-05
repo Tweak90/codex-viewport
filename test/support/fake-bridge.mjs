@@ -85,16 +85,6 @@ export class FakeBridge extends EventEmitter {
       return {};
     }
     if (method === "command/exec") {
-      if (p.command[0] === "gh")
-        return {
-          exitCode: 0,
-          stdout: JSON.stringify({
-            tag_name: "v9.0.0",
-            html_url:
-              "https://github.com/example/codex-web/releases/tag/v9.0.0",
-          }),
-          stderr: "",
-        };
       try {
         const r = await execFile(p.command[0], p.command.slice(1), {
           cwd: p.cwd,
@@ -110,17 +100,21 @@ export class FakeBridge extends EventEmitter {
         };
       }
     }
-    if (method === "thread/list")
-      return {
-        data: this.threads
-          .filter(
-            (t) =>
-              Boolean(t.archived) === Boolean(p.archived) &&
-              (!p.cwd || t.cwd === p.cwd),
-          )
-          .map((t) => ({ ...t, turns: [] })),
-        nextCursor: null,
+    if (method === "thread/list") {
+      const kind = (t) => {
+        if (!t.source) return "appServer";
+        if (typeof t.source === "string") return t.source;
+        const source = t.source.subAgent;
+        return source?.thread_spawn ? "subAgentThreadSpawn" : source === "review" ? "subAgentReview" : source === "compact" ? "subAgentCompact" : source ? "subAgentOther" : "unknown";
       };
+      const sources = p.sourceKinds?.length ? p.sourceKinds : ["cli", "vscode"];
+      const threads = this.threads.filter((t) =>
+        Boolean(t.archived) === Boolean(p.archived) && (!p.cwd || t.cwd === p.cwd) &&
+        (sources.includes(kind(t)) || (sources.includes("subAgent") && kind(t).startsWith("subAgent"))));
+      if (p.sortKey) threads.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      const start = Number(p.cursor || 0), end = start + (p.limit || 100);
+      return { data: threads.slice(start, end).map((t) => ({ ...t, turns: [] })), nextCursor: end < threads.length ? String(end) : null };
+    }
     if (method === "thread/start") {
       const t = {
         id: `test-thread-${randomUUID()}`,
@@ -154,6 +148,20 @@ export class FakeBridge extends EventEmitter {
       const t = this.threads.find((t) => t.id === p.threadId);
       t.updatedAt = Math.max(t.updatedAt + 1, Math.floor(Date.now() / 1000));
       t.status = { type: "active", activeFlags: [] };
+      if (p.input?.[0]?.text?.includes("AGENTS_TEST")) {
+        const agent = (nickname, overrides = {}) => ({
+          id: `test-agent-${randomUUID()}`, cwd: t.cwd, parentThreadId: t.id,
+          source: { subAgent: { thread_spawn: { parent_thread_id: t.id, depth: 1 } } },
+          agentNickname: nickname, agentRole: "reviewer", preview: `Task for ${nickname}`,
+          createdAt: 1, updatedAt: 2, status: { type: "idle" },
+          turns: [{ id: randomUUID(), status: "completed", items: [{ id: randomUUID(), type: "agentMessage", text: "ARCHIVED_AGENT_RESULT" }] }],
+          ...overrides,
+        });
+        this.threads.push(agent("Browser helper", {
+          status: { type: "active", activeFlags: [] }, updatedAt: 3,
+          turns: [{ id: randomUUID(), status: "inProgress", items: Array.from({ length: 60 }, (_, index) => ({ id: `agent-item-${index}`, type: "agentMessage", text: `agent-line-${String(index).padStart(3, "0")}` })) }],
+        }), agent("Earlier helper", { archived: true }), agent("Foreign helper", { cwd: path.join(this.root, "foreign-project") }));
+      }
       if (p.input?.[0]?.text?.includes("HISTORY_TEST"))
         t.turns.push({
           id: "large-history-turn-" + randomUUID(),

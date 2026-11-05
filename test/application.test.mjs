@@ -32,7 +32,11 @@ async function fixture(t) {
   const bridge = new FakeBridge(root),
     dataDir = path.join(root, "data"),
     projectRoot = path.join(root, "home/projects");
-  const app = await createConsoleServer({ bridge, dataDir, projectRoot });
+  const app = await createConsoleServer({
+    bridge, dataDir, projectRoot,
+    environment: { ...process.env, CODEX_WEB_LANGUAGE: "de" },
+    releaseFetcher: async () => ({ ok: true, status: 200, json: async () => ({ tag_name: "v9.0.0", html_url: "https://github.com/example/codex-web/releases/tag/v9.0.0", published_at: "2026-11-05T12:00:00Z" }) }),
+  });
   app.server.listen(0, "127.0.0.1");
   await once(app.server, "listening");
   const base = `http://127.0.0.1:${app.server.address().port}`;
@@ -80,6 +84,63 @@ async function fixture(t) {
     },
   };
 }
+
+test("project agent lists include archived agents, paginate and remain separate from project chats", async (t) => {
+  const f = await fixture(t);
+  assert.equal((await f.request("/api/projects/missing/agents")).status, 401);
+  await f.login();
+  const created = await f.request("/api/projects", { method: "POST", body: { name: "Agent fixture" } });
+  const project = created.body.project;
+  const root = { id: "root-chat", cwd: project.path, source: "cli", status: { type: "idle" }, turns: [] };
+  f.bridge.threads.push(root);
+  for (let i = 0; i < 52; i++) f.bridge.threads.push({
+    id: `agent-${i}`, cwd: project.path, parentThreadId: root.id,
+    source: { subAgent: { thread_spawn: { parent_thread_id: root.id, depth: 1 } } },
+    agentNickname: `Agent ${i}`, updatedAt: i, status: { type: i === 51 ? "active" : "idle" }, turns: [],
+  });
+  f.bridge.threads.push({ ...f.bridge.threads[1], id: "archived-agent", archived: true });
+  f.bridge.threads.push({ ...f.bridge.threads[1], id: "foreign-agent", cwd: path.join(f.root, "other") });
+  const before = f.bridge.calls.length;
+  const first = await f.request(`/api/projects/${project.id}/agents`);
+  assert.equal(first.status, 200);
+  assert.equal(first.body.data.length, 50);
+  assert.equal(first.body.data[0].id, "agent-51");
+  const second = await f.request(`/api/projects/${project.id}/agents?cursor=${encodeURIComponent(first.body.nextCursor)}`);
+  assert.deepEqual(second.body.data.map((a) => a.id), ["agent-1", "agent-0", "archived-agent"]);
+  assert.equal(second.body.data.at(-1).archived, true);
+  assert.equal(second.body.nextCursor, null);
+  const invalid = await f.request(`/api/projects/${project.id}/agents?cursor=broken`);
+  assert.equal(invalid.status, 400);
+  assert.ok(f.bridge.calls.slice(before).every((call) => call.method === "thread/list"));
+  const chats = await f.request("/api/rpc", { method: "POST", body: { method: "thread/list", params: { sourceKinds: ["cli", "vscode", "appServer", "exec"] } } });
+  assert.deepEqual(chats.body.result.data.map((thread) => thread.id), [root.id]);
+});
+
+test("agent output is project-scoped, paginated and never resumes or starts agent work", async (t) => {
+  const f = await fixture(t);
+  await f.login();
+  const { body: { project } } = await f.request("/api/projects", { method: "POST", body: { name: "Agent output fixture" } });
+  const root = { id: "agent-parent", cwd: project.path, source: "cli", name: "Parent chat", turns: [] };
+  const agent = {
+    id: "agent-child", cwd: project.path, agentNickname: "Reader", parentThreadId: root.id,
+    source: { subAgent: { thread_spawn: { parent_thread_id: root.id, depth: 1 } } },
+    status: { type: "idle" }, archived: true,
+    turns: [{ id: "agent-turn", status: "completed", items: Array.from({ length: 35 }, (_, i) => ({ id: `output-${i}`, type: "agentMessage", text: `Output ${i}` })) }],
+  };
+  f.bridge.threads.push(root, agent, { ...agent, id: "other-child", cwd: path.join(f.root, "other-project") });
+  const before = f.bridge.calls.length;
+  const first = await f.request(`/api/projects/${project.id}/agents/${agent.id}`);
+  assert.equal(first.status, 200);
+  assert.equal(first.body.parent.id, root.id);
+  assert.equal(first.body.data[0].items.length, 20);
+  assert.equal(first.body.data[0].items.at(-1).text, "Output 34");
+  const older = await f.request(`/api/projects/${project.id}/agents/${agent.id}?cursor=${encodeURIComponent(first.body.nextCursor)}`);
+  assert.equal(older.body.data[0].items.length, 15);
+  assert.equal(older.body.nextCursor, null);
+  assert.equal((await f.request(`/api/projects/${project.id}/agents/other-child`)).status, 404);
+  assert.equal((await f.request(`/api/projects/${project.id}/agents/${root.id}`)).status, 404);
+  assert.ok(f.bridge.calls.slice(before).every((call) => ["thread/read", "thread/items/list", "thread/turns/list"].includes(call.method)));
+});
 
 test("first-run password setup enforces minimum, protects API and socket, and persists without plaintext", async (t) => {
   const f = await fixture(t);
@@ -751,7 +812,6 @@ test("project preferences, pinned chats and composer drafts persist and migrate 
         method: "PATCH",
         body: {
           pins: [draft.id],
-          preferences: { notifications: true, sound: false },
         },
       })
     ).status,
@@ -784,7 +844,7 @@ test("project preferences, pinned chats and composer drafts persist and migrate 
     await readFile(path.join(f.dataDir, "workbench.json"), "utf8"),
   );
   assert.equal(stored.composers[id].text, "Mehrzeiliger\nEntwurf");
-  assert.equal(stored.preferences.notifications, true);
+  assert.equal(stored.preferences, undefined);
   await f.request("/api/rpc", {
     method: "POST",
     body: {
@@ -1105,30 +1165,21 @@ test("remote home paths are derived from Codex metadata; unknown paths never bec
   );
 });
 
-test("release lookup uses an explicitly configured fork without an installation-specific URL", async (t) => {
-  const f = await fixture(t);
-  const previous = process.env.CODEX_RELEASE_REPOSITORY;
-  try {
-    process.env.CODEX_RELEASE_REPOSITORY = "example/custom-web";
-    const release = new ReleaseInfo(f.app.projects);
-    assert.equal(
-      release.snapshot().url,
-      "https://github.com/example/custom-web/releases",
-    );
-    await release.check();
-    assert.ok(
-      f.bridge.calls.some((call) =>
-        call.params.command?.includes(
-          "repos/example/custom-web/releases/latest",
-        ),
-      ),
-    );
-    process.env.CODEX_RELEASE_REPOSITORY = "../invalid";
-    assert.throws(() => new ReleaseInfo(f.app.projects), /owner\/repo/);
-  } finally {
-    if (previous === undefined) delete process.env.CODEX_RELEASE_REPOSITORY;
-    else process.env.CODEX_RELEASE_REPOSITORY = previous;
-  }
+test("release lookup checks an explicit fork anonymously over HTTP without host commands", async () => {
+  const calls = [];
+  const release = new ReleaseInfo(async (url, options) => {
+    calls.push({ url, options });
+    return { ok: true, status: 200, json: async () => ({ tag_name: "v9.0.0", html_url: "https://github.com/example/custom-web/releases/tag/v9.0.0", published_at: "2026-11-05T12:00:00Z" }) };
+  });
+  release.configure({ repository: "example/custom-web" });
+  assert.equal(release.snapshot().url, "https://github.com/example/custom-web/releases");
+  const result = await release.check();
+  assert.equal(calls[0].url, "https://api.github.com/repos/example/custom-web/releases/latest");
+  assert.equal(calls[0].options.headers.Authorization, undefined);
+  assert.equal(result.publishedAt, "2026-11-05T12:00:00.000Z");
+  await release.check();
+  assert.equal(calls.length, 1);
+  assert.throws(() => release.configure({ repository: "../invalid" }), /owner\/repo/);
 });
 
 test("task overview and release checks report state without starting jobs or deploying", async (t) => {

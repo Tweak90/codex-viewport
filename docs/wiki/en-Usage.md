@@ -9,8 +9,9 @@ The sidebar contains projects, archive, usage limits, settings and chat search. 
 - **Overview:** project information, chat list and image previews.
 - **Chat:** project chat list with **Start new chat**, or the chat you last visited while switching tabs within this project.
 - **Images:** the selected project's gallery.
+- **Agents:** native subagents of this project, including archived agent histories.
 
-Switching between Overview, Images and Chat returns you to the same open chat. Selecting another project clears that return target and shows its chat list first. Navigation does not create a chat.
+Switching between Overview, Images, Agents and Chat returns you to the same open chat. Selecting another project clears that return target and shows its chat list first. Navigation does not create a chat.
 
 The top bar contains context usage, theme switching and sign-out. Files, read-only Git and terminal are in the tool panel; mobile devices also have the workspace menu. The gear button opens settings, with access to notifications and version information.
 
@@ -76,3 +77,15 @@ Full-text search covers messages and activities, including archived chats, with 
 **Tasks** shows running and recently updated chats, status, duration, errors and stop controls. Optional notices and sound work while the web UI is open.
 
 **Usage limits** shows account data and reset credits returned by Codex. A reset requires confirmation. The context indicator shows chat tokens and observed compactions; it is separate from account usage limits.
+
+## Agents
+
+The **Agents** tab lists active and previous subagents for the selected project. Use status filters or search by name, role or task. Select an agent to read its output, commands and tool results. The newest 20 entries load first; **Load older output** retrieves earlier entries. **Open parent chat** returns to the conversation that spawned the agent. Status and saved output refresh while this view is open. Reading agent output never starts or resumes a task.
+
+**Not loaded** is a native runtime status, not evidence that work completed. Archived agents remain readable when their saved histories still exist. Agents whose working directory belongs to a different project are kept separate.
+
+## Info and allowance shortcuts
+
+**Info** shows the installed version. **Check for updates** only reads GitHub releases; a newer release is shown with its version and publication date. No Docker access or installation is involved. Notifications, sound preferences and a panel-size reset button are not part of this dialog.
+
+Below the activity bar's usage icon, the upper percentage is the remaining 5-hour allowance and the lower percentage the remaining weekly allowance. Unavailable data is shown as a dash; values are never invented. Clicking opens the full usage dialog.

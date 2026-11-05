@@ -8,17 +8,14 @@
 flowchart LR
     B[Browser] -->|Angemeldete HTTP-Aufrufe| W[Webserver]
     W -->|Ereignisse via /events| B
-    W -->|JSON-RPC über WebSocket| G[Gateway]
-    G -->|WebSocket über Unix-Socket| C[Codex App Server]
+    W -->|JSON-RPC über WebSocket| C[Externer Codex App Server]
     C --> F[Projektdateien und Werkzeuge]
     W --> D[Web-Datenvolume]
 ```
 
 `server.mjs` liefert HTML, JavaScript und CSS aus. Steuerungsanfragen laufen authentifiziert über den Webserver. Der Browser verbindet sich nicht direkt mit dem Codex-Host und hält keine OpenAI-Anmeldedaten.
 
-`lib/bridge.mjs` hält die gemeinsame Verbindung zum Codex App Server. Unterstützt werden `ws://`/`wss://` und der lokale Unix-Control-Socket. Der mitgelieferte `gateway.mjs` leitet Nachrichten unverändert vom Netzwerk-WebSocket zum vorhandenen Socket weiter. Ein eigener WebSocket-Endpunkt kann den Gateway ersetzen.
-
-Ein Docker-Image enthält Webserver und Gateway. Compose wählt den jeweiligen Einstiegspunkt. Projektdateien und Codex-Anmeldung bleiben auf dem Codex-Host. Der Web-Container benötigt weder Codex-CLI noch Docker-Socket.
+`lib/bridge.mjs` hält die gemeinsame Verbindung zur externen Codex-App-Server-API über `ws://` oder `wss://`. Ein konfigurierter Bearer-Token wird beim Verbindungsaufbau übertragen. Der Web-Container enthält nur den Webclient, keinen Codex-Prozess und keine Projektdatei- oder Docker-Mounts.
 
 ## Ein Auftrag vom Browser bis zum Modell
 
@@ -50,8 +47,12 @@ Native Dateischnittstellen übernehmen Lesen und Schreiben. Verzeichnis-, Git-, 
 
 ## Herkunft und Kompatibilität
 
-Das Projekt wurde vollständig mit KI entwickelt. Oberfläche, Bridge, Gateway, Tests und Konfiguration wurden für dieses Projekt erstellt. Zur Recherche wurden die offizielle API-Dokumentation und Protokollschemata der installierten Codex-Version verwendet. Die Architektur eines anderen öffentlichen Codex-Web-Projekts wurde zur Einordnung gelesen; daraus wurden keine Quellcodedateien oder UI-Assets übernommen. Das Logo ist ebenfalls KI-generiert; Details stehen in der Branding-Dokumentation des Repositorys.
+Das Projekt wurde vollständig mit KI entwickelt. Oberfläche, Bridge, Tests und Konfiguration wurden für dieses Projekt erstellt. Zur Recherche wurden die offizielle API-Dokumentation und Protokollschemata der installierten Codex-Version verwendet. Die Architektur eines anderen öffentlichen Codex-Web-Projekts wurde zur Einordnung gelesen; daraus wurden keine Quellcodedateien oder UI-Assets übernommen. Das Logo ist ebenfalls KI-generiert; Details stehen in der Branding-Dokumentation des Repositorys.
 
 Verifiziert ist Codex 0.166.0. Änderungen am App-Server-Protokoll erfordern eine erneute Kompatibilitätsprüfung. Die [offizielle Dokumentation](https://learn.chatgpt.com/docs/app-server) beschreibt den App Server und seine Transportschnittstellen.
 
 Gespeicherte Einstellungen überschreiben ENV-Werte, solange sie nicht leer sind. Rückfrageantworten und Warteschlangenstarts speichern den Versandstatus vor dem Aufruf. Unbestätigte mutierende Aufrufe werden nicht erneut gesendet. Die Galerie fasst identische Dateien per SHA-256 zusammen und lässt interne Runtime-/Audit-Verzeichnisse aus.
+
+## Projekt-Agents
+
+`lib/agents.mjs` listet native Unteragenten des gewählten Projekts über `thread/list`, einschließlich archivierter Verläufe. Ihr Arbeitsverzeichnis muss zum Projekt passen. Ausgaben verwenden dieselben Verlaufsseiten mit 20 Einträgen wie Chats; beim Lesen wird kein Agent fortgesetzt oder gestartet. `public/agents.js` ergänzt Filter, Verknüpfungen zum übergeordneten Chat und regelmäßige Aktualisierung von Status und Ausgaben während der Anzeige. Der Laufzeitstatus wird unverändert dargestellt; ein nicht geladener Agent gilt nicht automatisch als abgeschlossen.

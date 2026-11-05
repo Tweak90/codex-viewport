@@ -8,7 +8,7 @@ Codex-Web ist eine selbstgehostete Browseroberfläche für einen vorhandenen Cod
 
 ## Einrichten und benutzen
 
-1. [Installation](Installation.md): Codex-Host, API-Gateway und Weboberfläche.
+1. [Installation](Installation.md): externe Codex-API und Docker-Weboberfläche.
 2. [Konfiguration](Konfiguration.md): Variablen, Passwort und Netzwerk.
 3. [Benutzung](Benutzung.md): Projekte, Chats, Anhänge und Werkzeuge.
 4. [Betrieb und Updates](Betrieb-und-Updates.md): Daten, Sicherungen und Aktualisierungen.

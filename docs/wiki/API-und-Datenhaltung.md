@@ -13,6 +13,7 @@ Die Browser-API von Codex-Web und das native App-Server-Protokoll sind getrennt.
 | `/api/state` | Verbindungs- und Projektzustand |
 | `/api/rpc` | Freigegebene native Methoden |
 | `/api/projects` | Projektverwaltung |
+| `/api/projects/:id/agents`, `/agents/:agentId` | Projektbezogene Agent-Liste und paginierte Ausgaben zum Lesen |
 | `/api/projects/:id/files`, `/uploads`, `/download`, `/media` | Dateien, Anhänge und Galerie |
 | `/api/chats/:id/questions` | Asynchrone Rückfragen und einmalige Antworten |
 | `/api/chats/:id/history` | Paginierter Verlauf |
@@ -43,7 +44,7 @@ Eine Kontingent-Rücksetzung besitzt einen Idempotenzschlüssel und erfordert ei
 | Web-Volume: `message-queue.json` | Zuständigkeit für Warteschlangeneinträge, Pausen und Startversuche |
 | Web-Volume: `questions.json` | Rückfragetexte, Optionen und Versandstatus; Antworten liegen im nativen Verlauf |
 | Web-Volume: `projects.json` | Projekt-IDs, Pfade, Zuordnungen, Vorgaben und Chat-Entwürfe |
-| Web-Volume: `workbench.json` | Pins, Eingabeentwürfe, Hinweise, beobachtete Aufgaben und Kontextwerte |
+| Web-Volume: `workbench.json` | Pins, Eingabeentwürfe, beobachtete Aufgaben und Kontextwerte |
 | Web-Volume: `search-index.json` | Durchsuchbare Textinhalte und Fundstellen |
 | Codex-Host | Native Chats, Anmeldung, Werkzeuge und Projektdateien |
 | Projekt: `.codex-web/uploads/` | Hochgeladene Anhänge |
