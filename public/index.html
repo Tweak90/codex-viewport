@@ -112,7 +112,7 @@
         </button>
         <button
           type="button"
-          data-activity="usage"
+          id="open-usage"
           class="activity-bottom activity-quota"
           title="Kontingente"
           aria-label="Kontingente"
@@ -121,6 +121,9 @@
             <path d="M4 19V9m8 10V4m8 15v-6" />
           </svg>
           <span class="activity-quota-values" aria-hidden="true"><span id="activity-usage-primary" title="5-Stunden-Kontingent">—</span><span id="activity-usage-weekly" title="Wochenkontingent">—</span></span>
+        </button>
+        <button id="open-settings" type="button" title="Einstellungen" aria-label="Einstellungen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg>
         </button>
       </nav>
       <aside class="sidebar" id="sidebar">
@@ -147,13 +150,6 @@
         <div id="project-list" class="project-list"></div>
         <button id="open-archive" class="archive-nav" type="button">
           ▣ <span>Archiv</span><span id="archive-count"></span>
-        </button>
-        <button id="open-settings" class="archive-nav" type="button">
-          <svg class="settings-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg>
-          <span>Einstellungen</span>
-        </button>
-        <button id="open-usage" class="archive-nav" type="button">
-          ◷ <span>Kontingente</span><span id="usage-summary"></span>
         </button>
         <button id="open-questions" class="archive-nav hidden" type="button">? <span>Rückfragen</span><span id="question-count"></span></button>
         <div class="section-label conversations-label">
@@ -205,6 +201,8 @@
           <button type="button" class="subtle" data-activity="terminal">
             Konsole
           </button>
+          <button type="button" class="icon-button" data-activity="usage" title="Kontingente" aria-label="Kontingente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m8 10V4m8 15v-6"/></svg></button>
+          <button type="button" class="icon-button" data-activity="settings" title="Einstellungen" aria-label="Einstellungen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg></button>
         </nav>
         <div class="sidebar-bottom">
           <div class="host-dot" id="host-dot"></div>

@@ -4,7 +4,7 @@
 
 ## Navigation
 
-The sidebar contains projects, archive, usage limits, settings and chat search. **New chat** appears directly below chat search.
+The wide sidebar contains projects, archive, questions and chat search. Usage limits and Settings are in the narrow activity bar: the usage icon, two percentages and the gear underneath. On mobile, these controls are compact icons in the opened menu. **New chat** appears directly below chat search.
 
 - **Overview:** project information, chat list and image previews.
 - **Chat:** project chat list with **Start new chat**, or the chat you last visited while switching tabs within this project.

@@ -22,7 +22,7 @@ The web container connects exclusively to an external Codex API over WebSocket. 
 
 ## Settings and ENV precedence
 
-**Settings** is in the left sidebar directly above **Usage limits**. The dialog has three categories:
+**Settings** opens from the gear in the narrow activity bar, directly below the two allowance percentages. The dialog has three categories:
 
 - **General settings:** language, send shortcut and follow-up behavior.
 - **Codex settings:** display name, API endpoint and token, and project base directory.

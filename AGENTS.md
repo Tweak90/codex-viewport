@@ -15,7 +15,7 @@ Local commands:
 - npm test
 - node --check public/app.js
 - docker compose config --quiet
-- docker build -t codex-vm-console:1.0.1 .
+- docker build -t codex-vm-console:1.0.2 .
 
 Browser tests start their own isolated mock-backed server and temporary project tree with `npm run test:browser`. Live tests use TEST_BASE_URL and TEST_PASSWORD only against a dedicated test deployment. Never set up or replace the production password during verification. Never consume real quota resets in tests. Folder deletion tests must use only disposable projects created by those tests. production Docker uses the configured image (latest by default) and repulls on deployment.
 

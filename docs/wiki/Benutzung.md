@@ -10,7 +10,7 @@ Die Seitenleiste enthält Projekte, Archiv, Kontingente und die Chatsuche. **Neu
 - **Chat**: Chatliste mit **Neuen Chat starten** oberhalb der vorhandenen Chats. Der Reiter legt keinen Chat an. Beim Wechsel zwischen Übersicht, Bildern und Chat innerhalb desselben Projekts kehrt er zum zuletzt geöffneten Chat zurück. Ein Projektwechsel setzt diese Rückkehr zurück.
 - **Bilder**: Galerie des ausgewählten Projekts.
 
-Die obere Aktionsleiste bietet Kontext, Darstellungswechsel und Abmelden. Dateien, lesende Git-Ansicht und Konsole sind in der Werkzeugleiste erreichbar; auf Mobilgeräten im aufklappbaren Seitenmenü. Das Zahnrad links öffnet **Einstellungen** mit Sprache, Eingabeverhalten und Anwendungskonfiguration. Der Info-Dialog mit Versionsinformationen ist von dort sowie über die Versionsanzeige erreichbar.
+Die obere Aktionsleiste bietet Kontext, Darstellungswechsel und Abmelden. Dateien, lesende Git-Ansicht und Konsole sind in der Werkzeugleiste erreichbar; auf Mobilgeräten im aufklappbaren Seitenmenü. Das Zahnrad unter den Kontingent-Prozentwerten der schmalen Aktivitätsleiste öffnet **Einstellungen** mit Sprache, Eingabeverhalten und Anwendungskonfiguration. Der Info-Dialog mit Versionsinformationen ist von dort sowie über die Versionsanzeige erreichbar.
 
 ## Projekte
 
@@ -78,3 +78,5 @@ Der Reiter **Agents** zeigt aktive und bisherige Unteragenten des ausgewählten 
 **Info** zeigt die installierte Version. **Nach Updates suchen** liest nur GitHub-Releases; eine neue Version wird mit Versionsnummer und Veröffentlichungsdatum angezeigt. Docker-Zugriff und Installation sind dafür nicht nötig. Benachrichtigungen, Hinweiston und eine Schaltfläche zum Zurücksetzen der Panelgrößen gehören nicht zum Dialog.
 
 Unter dem Kontingent-Symbol der schmalen Aktivitätsleiste zeigt der obere Prozentwert das verbleibende 5-Stunden-Kontingent, der untere das verbleibende Wochenkontingent. Fehlende Daten erscheinen als Strich; Werte werden nicht erfunden. Ein Klick öffnet die vollständige Kontingentanzeige.
+
+Einstellungen und Kontingente besitzen keine eigenen Einträge im breiten Projektmenü. Auf Mobilgeräten sind die beiden Funktionen als kompakte Symbole im geöffneten Menü erreichbar.

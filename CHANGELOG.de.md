@@ -2,6 +2,11 @@
 
 [English](CHANGELOG.md)
 
+## 1.0.2 — 2026-11-05
+
+- Einstellungszahnrad unter den 5-Stunden- und Wochen-Prozentwerten der schmalen Aktivitätsleiste wiederhergestellt.
+- Einstellungen und Kontingente aus der breiten Projektseitenleiste entfernt. Auf Mobilgeräten bleiben beide als kompakte Menüsymbole erreichbar.
+
 ## 1.0.1 — 2026-11-05
 
 - Englisch und sinnvolle Anwendungsvorgaben ohne ENV; klare Herkunftsmarkierung und gespeicherte Overrides.

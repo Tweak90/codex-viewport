@@ -127,6 +127,7 @@
     $("application-settings-status").textContent = I18N.t("Noch nicht gespeichert");
   }
   $("open-settings").onclick = safe(openSettings);
+  globalThis.codexSettings = { open: openSettings };
   const narrowLayout = matchMedia("(max-width: 640px)");
   const updateOrientation = () => dialog.querySelector(".settings-nav").setAttribute("aria-orientation", narrowLayout.matches ? "horizontal" : "vertical");
   narrowLayout.addEventListener("change", updateOrientation);

@@ -31,8 +31,8 @@ test("gear settings persist English and Enter behavior, preserve user names and 
   await login(page);
   const p = await project(page, "Dateien");
   try {
-    await expect(page.locator("#activity-settings")).toHaveCount(0);
-    await expect(page.locator("#open-settings + #open-usage")).toHaveCount(1);
+    await expect(page.locator(".activity-bar #open-usage + #open-settings")).toHaveCount(1);
+    await expect(page.locator(".sidebar #open-settings, .sidebar #open-usage")).toHaveCount(0);
     await page.locator("#open-settings").click();
     await expect(page.locator("#application-settings-dialog")).toBeVisible();
     await expect(page.locator("#settings-panel-general")).toBeVisible();
@@ -48,7 +48,7 @@ test("gear settings persist English and Enter behavior, preserve user names and 
     await page.locator("#save-application-settings").click();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.locator("#application")).toBeVisible();
-    await expect(page.locator("#open-settings")).toContainText("Settings");
+    await expect(page.locator("#open-settings")).toHaveAttribute("aria-label", "Settings");
     await expect(page.locator("#host-label")).toHaveText("Custom browser host");
     await expect(page.locator(`[data-project-row="${p.id}"] .project-name`)).toHaveText("Dateien");
     await expect(page.locator("#send-shortcut-hint")).toContainText("Enter to send");
@@ -73,6 +73,14 @@ test("gear settings persist English and Enter behavior, preserve user names and 
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
     await expect(page.locator("#host-label")).toHaveText("Test VM");
     await expect(page.locator("#send-shortcut-hint")).toContainText("Shift + Enter senden");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator("#menu").click();
+    await page.locator('.mobile-workspaces [data-activity="settings"]').click();
+    await expect(page.locator("#application-settings-dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await page.locator('.mobile-workspaces [data-activity="usage"]').click();
+    await expect(page.locator("#info-dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
   } finally {
     await api(page, "/api/settings", { values: { HOST_LABEL: "", CODEX_WEB_LANGUAGE: "", CODEX_SEND_WITH: "" } }, "PATCH");
     await cleanup(page, p);

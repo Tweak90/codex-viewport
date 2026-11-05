@@ -1,7 +1,7 @@
 name: codex-console
 services:
   web:
-    image: codex-vm-console:1.0.1
+    image: codex-vm-console:1.0.2
     build: .
     restart: unless-stopped
     init: true

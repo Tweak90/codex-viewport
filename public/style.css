@@ -2039,10 +2039,6 @@ dialog label > select {
     animation: none;
   }
 }
-#usage-summary {
-  font-size: 10px;
-  margin-left: auto;
-}
 .reset-detail {
   font-size: 10px;
   color: var(--muted);
@@ -3048,9 +3044,9 @@ button:hover,
   }
 }
 
-.settings-icon { width: 18px; height: 18px; flex: 0 0 18px; }
 .activity-bar .activity-quota { display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; min-height: 87px; padding: 8px 0; gap: 6px; }
 .activity-quota-values { display: grid; gap: 3px; font-size: 10px; line-height: 1.2; font-variant-numeric: tabular-nums; color: var(--text); }
+.mobile-workspaces .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; }
 .release-state { margin-top: 12px; }
 .release-details { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; font-size: 12px; margin: 16px 0; }
 .release-details dt { color: var(--muted); }

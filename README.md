@@ -65,7 +65,7 @@ Prefer Compose? Follow [Installation](docs/wiki/en-Installation.md). [compose.im
 
 Pull `latest` and recreate the container with the same environment file and data volume. The [update guide](docs/wiki/en-Operations-and-updates.md) includes the exact Docker commands. Updates are installed by the operator.
 
-Open **Settings** in the left sidebar above **Usage limits**. The dialog separates **General settings**, **Codex settings** and **Updates**; ENV details expand per field, and Save/Cancel stay visible. **Empty field: use ENV. Filled field: the saved setting wins.** Secrets are hidden; **Use default** clears a stored override. Docker ports, mounts, image selection stay in Docker/Compose configuration. See [Configuration](docs/wiki/en-Configuration.md).
+Open **Settings** with the gear in the narrow activity bar, below the two allowance percentages. The dialog separates **General settings**, **Codex settings** and **Updates**; ENV details expand per field, and Save/Cancel stay visible. **Empty field: use ENV. Filled field: the saved setting wins.** Secrets are hidden; **Use default** clears a stored override. Docker ports, mounts, image selection stay in Docker/Compose configuration. See [Configuration](docs/wiki/en-Configuration.md).
 
 Without ENV or saved overrides, the defaults are English, Shift+Enter to send, steering follow-ups and the label `Codex-Host`. The release repository defaults to this project. Configured ENV values are marked in Settings and can be overridden there. Supply your external API address in ENV or Settings; credentials are optional when the API permits it.
 

@@ -22,7 +22,7 @@ Der Web-Container verbindet sich ausschließlich über WebSocket mit einer exter
 
 ## Einstellungen und ENV-Vorrang
 
-**Einstellungen** steht in der linken Seitenleiste direkt über **Kontingente**. Der Dialog enthält drei Bereiche:
+**Einstellungen** öffnet das Zahnrad in der schmalen Aktivitätsleiste direkt unter den beiden Kontingent-Prozentwerten. Der Dialog enthält drei Bereiche:
 
 - **Allgemeine Einstellungen:** Sprache, Sendetaste und Folgenachrichten.
 - **Codex-Einstellungen:** Anzeigename, API-Adresse und Token sowie Projektbasis.

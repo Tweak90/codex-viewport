@@ -2436,6 +2436,7 @@ async function activateActivity(action) {
   if (action === "tasks") return globalThis.codexFeatures?.showTasks();
   if (action === "search") return globalThis.codexFeatures?.showSearch();
   if (action === "usage") return showInfo();
+  if (action === "settings") return globalThis.codexSettings?.open();
   if (["projects", "chat", "images"].includes(action))
     return activateView(
       { projects: "project", chat: "chat", images: "gallery" }[action],
@@ -2580,8 +2581,6 @@ function updateUsageSummary(usage) {
   const weekly = windows.find((window) => window.windowDurationMins === 10080);
   $("activity-usage-primary").textContent = remaining(fiveHours);
   $("activity-usage-weekly").textContent = remaining(weekly);
-  const primary = remaining(limits?.primary);
-  $("usage-summary").textContent = primary === "—" ? "" : primary.slice(0, -1) + I18N.t("% frei");
 }
 async function refreshUsageSummary() {
   state.usageFetch ||= api("/api/usage").finally(() => {

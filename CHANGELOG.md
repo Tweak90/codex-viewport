@@ -2,6 +2,11 @@
 
 [Deutsch](CHANGELOG.de.md)
 
+## 1.0.2 — 2026-11-05
+
+- Settings gear restored below the 5-hour and weekly percentages in the narrow activity bar.
+- Removed Settings and Usage limits entries from the wide project sidebar. Both remain accessible as compact menu icons on mobile.
+
 ## 1.0.1 — 2026-11-05
 
 - English and sensible application defaults when ENV is absent; explicit environment/source markers and saved overrides.
