@@ -1,0 +1,36 @@
+name: Checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npm run check:publication
+      - run: npm run check:docs
+      - run: npm run check:i18n
+      - name: Browser integration tests
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test
+      - name: Syntax and Compose
+        run: |
+          node --check server.mjs
+          node --check gateway.mjs
+          node --check public/app.js
+          CODEX_WS_URL=ws://codex-host.example:4500 docker compose --env-file /dev/null config --quiet
+          docker compose -f compose.gateway.yml config --quiet
+          CODEX_WS_URL=ws://codex-host.example:4500 CODEX_API_TOKEN=ci-validation docker compose --env-file /dev/null -f compose.image.yml config --quiet
+      - name: Build Docker image
+        run: docker build -t codex-vm-console:ci .

@@ -1,0 +1,30 @@
+{
+  "name": "codex-vm-console",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Self-hosted browser console for the Codex app-server running on a VM",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tweak90/codex-web.git"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:browser": "playwright test",
+    "check:publication": "node scripts/check-publication.mjs",
+    "check:docs": "node scripts/sync-wiki.mjs --check",
+    "check:i18n": "node scripts/check-i18n.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.0",
+    "marked": "^17.0.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

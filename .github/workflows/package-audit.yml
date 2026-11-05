@@ -1,0 +1,30 @@
+name: Check container metadata
+on:
+  workflow_dispatch:
+    inputs:
+      withdraw:
+        description: "Temporarily withdraw the package when retained blobs must no longer be public"
+        type: boolean
+        default: false
+      sanitize:
+        description: "Remove provenance metadata while retaining every runnable platform and tag"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  packages: write
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "22"
+      - run: node scripts/check-container-metadata.mjs
+        env:
+          SANITIZE_METADATA: ${{ inputs.sanitize }}
+          WITHDRAW_PACKAGE: ${{ inputs.withdraw }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
+          GH_REPOSITORY: ${{ github.repository }}

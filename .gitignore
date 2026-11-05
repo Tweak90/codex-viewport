@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.data/
+.codex-web/
+ssh/
+dist/
+test-results/
+playwright-report/

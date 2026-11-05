@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1e1e1e" />
+    <title>Codex-Web · VM Console</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/vendor/marked.js"></script>
+    <script defer src="/vendor/purify.js"></script>
+    <script defer src="/i18n.js"></script>
+    <script defer src="/app.js"></script>
+    <script defer src="/features.js"></script>
+    <script defer src="/settings.js"></script>
+    <script defer src="/questions.js"></script>
+    <script defer src="/queue.js"></script>
+  </head>
+  <body>
+    <section id="auth-screen" class="auth-screen">
+      <form id="auth-form" class="auth-card">
+        <img src="/assets/logo.png" width="72" height="72" alt="Codex-Web" />
+        <div class="eyebrow">DEINE PROJEKTE. DEINE KONTROLLE.</div>
+        <h1 id="auth-title">Willkommen bei Codex-Web</h1>
+        <p id="auth-description">Anmeldung wird geladen …</p>
+        <label
+          >Passwort<input
+            id="auth-password"
+            type="password"
+            minlength="4"
+            required
+            autocomplete="current-password"
+            autofocus
+        /></label>
+        <label id="auth-confirm-label" class="hidden"
+          >Passwort wiederholen<input
+            id="auth-confirm"
+            type="password"
+            minlength="4"
+            autocomplete="new-password"
+        /></label>
+        <p id="auth-error" class="form-error" role="alert"></p>
+        <button id="auth-submit" class="accent-button" type="submit">
+          Anmelden
+        </button>
+        <button id="auth-theme" class="subtle" type="button">
+          Darstellung wechseln
+        </button>
+      </form>
+    </section>
+    <div class="app hidden" id="application">
+      <nav class="activity-bar" aria-label="Arbeitsbereiche">
+        <button
+          type="button"
+          data-activity="projects"
+          title="Projekte"
+          aria-label="Projekte"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H4v15h12v-4M8 3h8l4 4v14H8V3Zm8 0v5h4" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-activity="chat"
+          title="Chat"
+          aria-label="Chat"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 4h18v13H9l-6 4V4Zm4 5h10M7 13h7" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-activity="images"
+          title="Projektbilder"
+          aria-label="Projektbilder"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 4h18v16H3V4Zm0 12 6-6 5 5 3-3 4 4" />
+            <circle cx="16" cy="8" r="1" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-activity="files"
+          title="Dateien"
+          aria-label="Dateien"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 5h7l2 3h9v12H3V5Z" />
+          </svg>
+        </button>
+        <button type="button" data-activity="git" title="Git" aria-label="Git">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="5" r="2" />
+            <circle cx="6" cy="19" r="2" />
+            <circle cx="18" cy="5" r="2" />
+            <path d="M6 7v10m12-10c0 6-12 3-12 8" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-activity="terminal"
+          title="Konsole"
+          aria-label="Konsole"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m4 6 6 6-6 6m9 0h7" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-activity="usage"
+          class="activity-bottom"
+          title="Kontingente"
+          aria-label="Kontingente"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V9m8 10V4m8 15v-6" />
+          </svg>
+        </button>
+        <button type="button" id="activity-settings" title="Einstellungen" aria-label="Einstellungen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg>
+        </button>
+      </nav>
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="/" aria-label="Codex-Web Startseite"
+          ><img
+            class="brand-logo"
+            src="/assets/logo.png"
+            width="44"
+            height="44"
+            alt=""
+          /><span>Codex-Web <small>VM CONSOLE</small></span></a
+        >
+        <div class="section-label">
+          PROJEKTE
+          <button
+            class="icon-button"
+            id="add-project"
+            title="Projekt hinzufügen"
+            aria-label="Projekt hinzufügen"
+          >
+            +
+          </button>
+        </div>
+        <div id="project-list" class="project-list"></div>
+        <button id="open-archive" class="archive-nav" type="button">
+          ▣ <span>Archiv</span><span id="archive-count"></span>
+        </button>
+        <button id="open-usage" class="archive-nav" type="button">
+          ◷ <span>Kontingente</span><span id="usage-summary"></span>
+        </button>
+        <button id="open-settings" class="archive-nav" type="button">
+          <svg class="settings-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 3-.7 2.3-2 .9L4 5.7 2 9l1.7 1.7v2.6L2 15l2 3.3 2.3-.5 2 .9L9 21h4l.7-2.3 2-.9 2.3.5 2-3.3-1.7-1.7v-2.6L20 9l-2-3.3-2.3.5-2-.9L13 3H9Z"/><circle cx="11" cy="12" r="3"/></svg>
+          <span>Einstellungen</span>
+        </button>
+        <button id="open-questions" class="archive-nav hidden" type="button">? <span>Rückfragen</span><span id="question-count"></span></button>
+        <div class="section-label conversations-label">
+          <span>CHATS <span id="thread-count"></span></span
+          ><button
+            id="refresh"
+            class="icon-button"
+            title="Aktualisieren"
+            aria-label="Aktualisieren"
+          >
+            ↻
+          </button>
+        </div>
+        <input
+          class="search"
+          id="search"
+          placeholder="Chats durchsuchen …"
+          aria-label="Chats durchsuchen"
+        />
+        <button class="new-chat" id="new-chat" type="button">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Neuer Chat <kbd>Ctrl K</kbd>
+        </button>
+        <label class="archive-toggle hidden"
+          ><input type="checkbox" id="show-archived" /> Archiv anzeigen</label
+        >
+        <nav
+          id="thread-list"
+          class="thread-list"
+          aria-label="Chatverlauf"
+        ></nav>
+        <button id="more-threads" class="subtle hidden">
+          Weitere Chats laden
+        </button>
+        <nav class="mobile-workspaces" aria-label="Werkzeuge">
+          <button type="button" class="subtle" data-activity="files">
+            Dateien
+          </button>
+          <button type="button" class="subtle" data-activity="git">Git</button>
+          <button type="button" class="subtle" data-activity="terminal">
+            Konsole
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="host-dot" id="host-dot"></div>
+          <div>
+            <strong id="host-label">KI-VM</strong
+            ><span id="connection-label">Verbindung wird aufgebaut …</span>
+          </div>
+          <button
+            class="icon-button"
+            id="connection-info"
+            title="Verbindung und Nutzung"
+            aria-label="Verbindung und Nutzung"
+          >
+            i
+          </button>
+        </div>
+      </aside>
+      <div class="main-shell">
+        <header class="topbar">
+          <button
+            class="icon-button mobile-menu"
+            id="menu"
+            aria-label="Menü öffnen"
+          >
+            ☰
+          </button>
+          <div class="breadcrumb">
+            <span class="muted">Workspace</span><span class="slash">/</span
+            ><strong id="project-title">Alle Projekte</strong
+            ><span class="live-pill" id="live-pill">VERBINDET</span>
+          </div>
+          <div class="top-actions">
+            <button
+              id="theme-toggle"
+              class="subtle"
+              type="button"
+              aria-label="Darstellung wechseln"
+            >
+              Light Mode
+            </button>
+            <button id="logout" class="subtle" type="button">Abmelden</button>
+          </div>
+        </header>
+        <nav class="editor-tabs" aria-label="Projektansichten">
+          <button type="button" data-view-tab="project">▧ Übersicht</button>
+          <button type="button" data-view-tab="chat">⌘ Chat</button>
+          <button type="button" data-view-tab="gallery">▧ Bilder</button>
+        </nav>
+        <div class="workspace">
+          <main class="conversation">
+            <div
+              id="connection-error"
+              class="connection-error hidden"
+              role="status"
+            ></div>
+            <section id="archive-toolbar" class="archive-toolbar hidden">
+              <div>
+                <strong>Archiv</strong
+                ><span id="archive-selection">Archivierte Chats verwalten</span>
+              </div>
+              <div class="archive-actions">
+                <button id="archive-select-all" type="button" class="subtle">
+                  Angezeigte auswählen</button
+                ><button
+                  id="archive-restore-selected"
+                  type="button"
+                  class="small-accent"
+                >
+                  Wiederherstellen</button
+                ><button
+                  id="archive-delete-selected"
+                  type="button"
+                  class="danger-button"
+                >
+                  Endgültig löschen</button
+                ><button id="archive-overview" type="button" class="subtle">
+                  Übersicht
+                </button>
+              </div>
+            </section>
+            <div id="chat" class="chat" aria-live="polite" tabindex="0">
+              <div class="welcome">
+                <div class="eyebrow">DEIN CODE. DEINE MASCHINE.</div>
+                <h1>Was bauen wir heute?</h1>
+                <p>
+                  Wähle ein Projekt und starte einen Chat.<br />Codex arbeitet
+                  direkt auf deiner KI-VM.
+                </p>
+                <div class="welcome-grid">
+                  <button
+                    data-prompt="Schau dir dieses Projekt an und erkläre mir den Aufbau."
+                  >
+                    <span>{ }</span> Projekt verstehen <b>↗</b></button
+                  ><button
+                    data-prompt="Prüfe das Projekt auf Fehler und schlage konkrete Verbesserungen vor."
+                  >
+                    <span>✓</span> Code prüfen <b>↗</b></button
+                  ><button id="welcome-project">
+                    <span>+</span> Projekt hinzufügen <b>↗</b>
+                  </button>
+                </div>
+                <div class="welcome-note">
+                  <span class="tiny-dot"></span> Browser → Codex API → KI-VM
+                </div>
+              </div>
+            </div>
+            <div id="requests" class="requests"></div>
+            <details id="message-queue" class="message-queue hidden"><summary id="message-queue-summary"></summary><ul id="message-queue-items"></ul></details>
+            <footer class="composer-wrap">
+              <div id="active-state" class="active-state hidden">
+                <span class="working-dot"></span
+                ><span id="active-text">Codex arbeitet …</span
+                ><button id="stop" class="stop-button">■ Stoppen</button>
+              </div>
+              <form id="composer" class="composer">
+                <textarea
+                  id="prompt"
+                  rows="2"
+                  placeholder="Gib Codex einen Auftrag …"
+                  aria-label="Nachricht an Codex"
+                ></textarea>
+                <div class="composer-bottom">
+                  <button
+                    id="attach-files"
+                    type="button"
+                    class="subtle attach-button"
+                    aria-label="Dateien anhängen"
+                    title="Dateien anhängen oder Bilder mit Strg+V einfügen"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="m20 11-8.5 8.5a5 5 0 0 1-7-7L14 3a3.5 3.5 0 0 1 5 5l-9.5 9.5a2 2 0 0 1-3-3l8.5-8.5"
+                      />
+                    </svg>
+                  </button>
+                  <div class="model-options">
+                    <select id="model" aria-label="Modell">
+                      <option value="">Modell wird geladen …</option></select
+                    ><select id="effort" aria-label="Denkaufwand">
+                      <option value="medium">Medium</option></select
+                    ><select id="access" aria-label="Berechtigungen">
+                      <option value="inherit">VM-Einstellungen</option>
+                      <option value="full">Vollzugriff</option>
+                      <option value="workspace">Projektzugriff</option>
+                      <option value="read">Nur lesen</option>
+                    </select>
+                  </div>
+                  <button
+                    class="send-button"
+                    id="send"
+                    type="submit"
+                    title="Nachricht senden (Shift+Enter)"
+                    aria-label="Nachricht senden"
+                  >
+                    <span>Senden</span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m21 3-7.5 18-3.5-7-7-3.5L21 3ZM21 3 10 14" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+              <div class="composer-hint">
+                <span id="cwd-hint">Wähle ein Projekt, um loszulegen.</span
+                ><span id="send-shortcut-hint">Enter Zeilenumbruch · Shift + Enter senden</span>
+              </div>
+            </footer>
+          </main>
+          <aside id="tools" class="tools hidden">
+            <div class="tools-tabs">
+              <button data-tab="files" class="selected">Dateien</button
+              ><button data-tab="git">Git</button
+              ><button data-tab="terminal">Konsole</button
+              ><button
+                id="close-tools"
+                class="icon-button"
+                aria-label="Tools schließen"
+              >
+                ×
+              </button>
+            </div>
+            <section id="files-tab" class="tool-content">
+              <div class="file-toolbar">
+                <button
+                  id="file-up"
+                  class="icon-button"
+                  title="Übergeordnetes Verzeichnis"
+                  aria-label="Übergeordnetes Verzeichnis"
+                >
+                  ↑</button
+                ><input id="file-path" aria-label="Verzeichnispfad" /><button
+                  id="file-refresh"
+                  class="icon-button"
+                  aria-label="Dateien aktualisieren"
+                >
+                  ↻
+                </button>
+              </div>
+              <div id="file-list" class="file-list"></div>
+              <div id="editor" class="editor hidden">
+                <div class="editor-heading">
+                  <span id="editor-name"></span
+                  ><button id="save-file" class="small-accent">Speichern</button
+                  ><button
+                    id="close-editor"
+                    class="icon-button"
+                    aria-label="Datei schließen"
+                  >
+                    ×
+                  </button>
+                </div>
+                <textarea
+                  id="file-content"
+                  spellcheck="false"
+                  aria-label="Dateiinhalt"
+                ></textarea>
+              </div>
+            </section>
+            <section id="git-tab" class="tool-content hidden">
+              <div class="panel-heading">
+                <strong>Änderungen im Projekt</strong
+                ><button
+                  id="git-refresh"
+                  class="icon-button"
+                  aria-label="Git aktualisieren"
+                >
+                  ↻
+                </button>
+              </div>
+              <pre id="git-status" class="git-status">Wähle ein Projekt.</pre>
+              <div class="section-label">DIFF · WORKTREE & INDEX</div>
+              <pre id="git-diff" class="git-diff"></pre>
+            </section>
+            <section id="terminal-tab" class="tool-content hidden">
+              <div class="panel-heading">
+                <strong>Konsole auf der KI-VM</strong
+                ><button id="terminal-stop" class="subtle hidden">
+                  Stoppen
+                </button>
+              </div>
+              <p class="panel-note">
+                Befehle laufen im gewählten Projektverzeichnis.
+              </p>
+              <pre id="terminal-output" class="terminal-output">Bereit.</pre>
+              <form id="terminal-form">
+                <span>$</span
+                ><input
+                  id="terminal-command"
+                  placeholder="git status"
+                  aria-label="Shell-Befehl"
+                  autocomplete="off"
+                /><button class="small-accent">↵</button>
+              </form>
+            </section>
+          </aside>
+        </div>
+        <div class="ide-statusbar">
+          <span id="status-connection">Verbindung wird aufgebaut …</span
+          ><span id="status-project">Kein Projekt ausgewählt</span
+          ><span class="status-spacer"></span><span>Codex-Web</span
+          ><span>UTF-8</span>
+        </div>
+      </div>
+    </div>
+    <dialog id="project-dialog">
+      <form id="project-form">
+        <div class="dialog-heading">
+          <h2>Projekt anlegen</h2>
+          <button
+            type="button"
+            class="icon-button dialog-close"
+            aria-label="Schließen"
+          >
+            ×
+          </button>
+        </div>
+        <p>
+          Ein eigenes Projekt mit Ordner auf der KI-VM. Darin kannst du beliebig
+          viele Chats anlegen.
+        </p>
+        <label
+          >Name<input
+            id="project-name"
+            required
+            placeholder="Mein Projekt" /></label
+        ><label
+          >Verzeichnis auf der KI-VM
+          <div class="input-row">
+            <input
+              id="project-path"
+              required
+              placeholder="Projektpfad auf dem Codex-Host"
+            /><button type="button" id="browse-project" class="subtle">
+              Auswählen
+            </button>
+          </div></label
+        ><label
+          >Aktion<select id="project-mode">
+            <option value="local">Nur lokal anlegen</option>
+            <option value="create">Git erstellen</option>
+            <option value="existing">Vorhandenes Verzeichnis verwenden</option>
+            <option value="clone">Git klonen</option>
+          </select></label
+        ><label id="clone-label" class="hidden"
+          >Repository-URL<input
+            id="project-repo"
+            placeholder="https://github.com/…"
+        /></label>
+        <div id="project-browser" class="project-browser hidden"></div>
+        <div id="project-error" class="form-error" role="alert"></div>
+        <div class="dialog-actions">
+          <button type="button" class="subtle dialog-close">Abbrechen</button
+          ><button type="submit" id="project-submit" class="accent-button">
+            Projekt anlegen
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="actions-dialog">
+      <div class="dialog-heading">
+        <h2>Chat verwalten</h2>
+        <button class="icon-button dialog-close" aria-label="Schließen">
+          ×
+        </button>
+      </div>
+      <div class="action-list">
+        <button id="rename-chat">✎ Chat umbenennen</button
+        ><button id="fork-chat">⑂ Chat abzweigen</button
+        ><button id="compact-chat">⇥ Kontext komprimieren</button
+        ><button id="archive-chat">▣ Chat archivieren</button
+        ><button id="assign-chat">Chat einem Projekt zuordnen</button>
+        <button id="delete-chat" class="danger-text">
+          Chat endgültig löschen
+        </button>
+      </div>
+    </dialog>
+    <dialog id="info-dialog">
+      <div class="dialog-heading">
+        <h2>Verbindung & Nutzung</h2>
+        <button class="icon-button dialog-close" aria-label="Schließen">
+          ×
+        </button>
+      </div>
+      <div id="info-content"></div>
+    </dialog>
+    <dialog id="image-dialog" class="image-dialog">
+      <div class="dialog-heading">
+        <strong id="image-title">Bild</strong
+        ><a id="image-download" class="subtle" download>Herunterladen</a
+        ><button
+          type="button"
+          class="icon-button dialog-close"
+          aria-label="Schließen"
+        >
+          ×
+        </button>
+      </div>
+      <img id="image-preview" alt="Bildvorschau" />
+    </dialog>
+    <dialog id="project-picker">
+      <div class="dialog-heading">
+        <h2>Projekt auswählen</h2>
+        <button
+          type="button"
+          class="icon-button dialog-close"
+          aria-label="Schließen"
+        >
+          ×
+        </button>
+      </div>
+      <p id="picker-description">In welchem Projekt soll der Chat liegen?</p>
+      <div id="picker-list" class="action-list"></div>
+      <button id="picker-new-project" type="button" class="accent-button">
+        + Neues Projekt
+      </button>
+    </dialog>
+    <dialog id="delete-project-dialog">
+      <form id="delete-project-form">
+        <div class="dialog-heading">
+          <h2>Projekt löschen</h2>
+          <button
+            type="button"
+            class="icon-button dialog-close"
+            aria-label="Schließen"
+          >
+            ×
+          </button>
+        </div>
+        <p id="delete-project-description"></p>
+        <label class="check-label"
+          ><input id="delete-project-files" type="checkbox" /> Projektordner und
+          alle Dateien auf der KI-VM ebenfalls löschen</label
+        >
+        <p class="panel-note">
+          Die zugehörigen Chats werden archiviert. Ohne die Ordner-Option
+          bleiben die Dateien erhalten.
+        </p>
+        <label
+          >Projektnamen zur Bestätigung eingeben<input
+            id="delete-project-name"
+            required
+            autocomplete="off"
+        /></label>
+        <p id="delete-project-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="subtle dialog-close">Abbrechen</button
+          ><button
+            type="submit"
+            id="delete-project-submit"
+            class="danger-button"
+          >
+            Projekt löschen
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="confirm-dialog">
+      <form id="confirm-form">
+        <div class="dialog-heading">
+          <h2 id="confirm-title">Bestätigen</h2>
+          <button
+            type="button"
+            class="icon-button dialog-close"
+            aria-label="Schließen"
+          >
+            ×
+          </button>
+        </div>
+        <p id="confirm-description"></p>
+        <div class="dialog-actions">
+          <button type="button" class="subtle dialog-close">Abbrechen</button
+          ><button type="submit" id="confirm-submit" class="danger-button">
+            Endgültig löschen
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <div
+      id="context-menu"
+      class="context-menu hidden"
+      role="menu"
+      aria-label="Kontextmenü"
+    ></div>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </body>
+</html>
