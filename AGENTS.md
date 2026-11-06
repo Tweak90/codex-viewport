@@ -1,8 +1,8 @@
-# Codex-Web maintenance
+# Codex Viewport maintenance
 
 By default Enter inserts a newline and Shift+Enter sends; the user can reverse this in Settings. Follow-ups can steer active work or use the native queue. The workbench scope excludes Git commit/push/branch controls, Git worktrees and a recycle bin. Keep the existing read-only Git view and project Git creation/clone options; do not add those excluded features unless explicitly requested.
 
-This is an independent browser client for the Codex App Server API. Keep the web container separate from the Codex process and project files on the KI VM. The only supported transport is the external WebSocket API (ws:// or wss://). Do not add local process or filesystem transport fallbacks. Do not copy code or assets from third-party Codex web clients or unpacked official desktop apps.
+This is an independent browser client for the Codex App Server API. Keep the web container separate from the Codex process and project files on the KI VM. The only supported transport is the external WebSocket API (ws:// or wss://). Do not add local process or filesystem transport fallbacks. Do not copy code or assets from third-party browser clients for Codex or unpacked official desktop apps.
 
 The operator performs every production Docker deployment. NEVER deploy, pull images, recreate, restart, stop or update the running production Docker stack or its containers. Prepare, test, commit, push and publish release images only. Read-only production Docker diagnostics are allowed. Do not change live production Docker configuration unless the user specifically requests that configuration edit; never combine it with deployment.
 
@@ -15,7 +15,7 @@ Local commands:
 - npm test
 - node --check public/app.js
 - docker compose config --quiet
-- docker build -t codex-vm-console:1.0.2 .
+- docker build -t codex-viewport:1.1.0 .
 
 Browser tests start their own isolated mock-backed server and temporary project tree with `npm run test:browser`. Live tests use TEST_BASE_URL and TEST_PASSWORD only against a dedicated test deployment. Never set up or replace the production password during verification. Never consume real quota resets in tests. Folder deletion tests must use only disposable projects created by those tests. production Docker uses the configured image (latest by default) and repulls on deployment.
 

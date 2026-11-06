@@ -1,12 +1,14 @@
-<p align="center"><img src="public/assets/logo.png?v=blue-terminal" width="120" alt="Codex-Web logo"></p>
+<p align="center"><img src="public/assets/logo.png?v=viewport-transparent-1" width="420" alt="Codex Viewport logo"></p>
 
-# Codex-Web
+# Codex Viewport
 
-**Your Codex projects, chats and tools in a self-hosted browser interface.**
+**A self-hosted web remote for Codex.**
 
-[Deutsch](README.de.md) · [Wiki](https://github.com/Tweak90/codex-web/wiki) · [Documentation](docs/wiki/en-Home.md) · [Releases](https://github.com/Tweak90/codex-web/releases) · [Changelog](CHANGELOG.md)
+The transparent logo is shared by the sign-in screen, application icons and documentation.
 
-Codex-Web connects to an existing Codex App Server. The web container connects exclusively to an external Codex API over WebSocket. Your Codex sign-in, tools and project files stay on the Codex host.
+[Deutsch](README.de.md) · [Wiki](https://github.com/Tweak90/codex-viewport/wiki) · [Documentation](docs/wiki/en-Home.md) · [Releases](https://github.com/Tweak90/codex-viewport/releases) · [Changelog](CHANGELOG.md)
+
+Codex Viewport connects to an existing Codex App Server. The web container connects exclusively to an external Codex API over WebSocket. Your Codex sign-in, tools and project files stay on the Codex host.
 
 > **This project was built entirely with AI. Use it at your own risk.**
 
@@ -25,6 +27,9 @@ By default, **Enter inserts a newline** and **Shift+Enter sends**. You can rever
 
 Attachments selected while a new chat is being created wait for that chat and stay assigned to it.
 
+
+Version 1.1.0 uses the Codex Viewport repository, image, configuration and upload identifiers throughout. Existing installations must explicitly retain their data volume and review the renamed settings before upgrading; see the [release notes](docs/releases/v1.1.0.md). Publishing a release does not deploy it.
+
 ## Requirements
 
 - A running, signed-in Codex App Server; verified with **Codex 0.166.0**.
@@ -33,14 +38,14 @@ Attachments selected while a new chat is being created wait for that chat and st
 
 ```mermaid
 flowchart LR
-    Browser -->|HTTP and events| Web[Codex-Web container]
+    Browser -->|HTTP and events| Web[Codex Viewport container]
     Web -->|WebSocket API| Codex[External Codex App Server]
     Codex --> Files[Projects and tools on Codex host]
 ```
 
 ## Run the published Docker image
 
-The published image is `ghcr.io/tweak90/codex-web-ui:latest` for Linux/amd64. No source checkout or local build is needed. Public packages require no registry sign-in; for restricted packages, first run `docker login ghcr.io` with an account that has read access.
+The published image is `ghcr.io/tweak90/codex-viewport-ui:latest` for Linux/amd64. No source checkout or local build is needed. Public packages require no registry sign-in; for restricted packages, first run `docker login ghcr.io` with an account that has read access.
 
 Create `.env.web` with your external API address and its token, if required:
 
@@ -51,12 +56,12 @@ HOST_LABEL=Codex-Host
 ```
 
 ```bash
-docker volume create codex-web-data
-docker pull ghcr.io/tweak90/codex-web-ui:latest
-docker run -d --name codex-web --restart unless-stopped --init \
+docker volume create codex-viewport-data
+docker pull ghcr.io/tweak90/codex-viewport-ui:latest
+docker run -d --name codex-viewport --restart unless-stopped --init \
   -p 8787:8787 --env-file .env.web \
-  -v codex-web-data:/data \
-  ghcr.io/tweak90/codex-web-ui:latest
+  -v codex-viewport-data:/data \
+  ghcr.io/tweak90/codex-viewport-ui:latest
 ```
 
 Replace the `.example` hostname and token; leave the token empty if the API does not require one. Open `http://web-host.example:8787` and set a password of at least four characters. Keep the data volume for future updates.
@@ -75,7 +80,7 @@ Without ENV or saved overrides, the defaults are English, Shift+Enter to send, s
 
 ## Documentation and development
 
-The [Wiki](https://github.com/Tweak90/codex-web/wiki) starts with a language chooser. It covers installation, usage, troubleshooting, architecture, APIs, data storage and the tech stack. All pages are also available in German and English [directly in this repository](docs/wiki/Home.md).
+The [Wiki](https://github.com/Tweak90/codex-viewport/wiki) starts with a language chooser. It covers installation, usage, troubleshooting, architecture, APIs, data storage and the tech stack. All pages are also available in German and English [directly in this repository](docs/wiki/Home.md).
 
 ```bash
 npm ci

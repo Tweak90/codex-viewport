@@ -1,13 +1,11 @@
-# Logo
+# Codex Viewport branding
 
-The selected Codex-Web mark is an original AI-generated blue browser/terminal frame with a cyan cursor. Its PNG alpha channel keeps the background transparent in both light and dark themes.
+**A self-hosted web remote for Codex.**
 
-`public/assets/logo.png` is the shared asset for sign-in, the sidebar, chat avatars, browser notifications, favicon, README and Wiki. Interface references use an asset revision query to refresh cached copies after the logo change. No colored background tile or theme-specific frame is added.
+The logo was supplied and selected by the project owner. It combines a teal terminal/cloud symbol, dark viewport corners and the Codex Viewport wordmark. Its light background was removed with the built-in image editing tool; the result has a genuine PNG alpha channel, including the enclosed spaces within the symbol and letters. `public/assets/logo.png` is the shared transparent wordmark for sign-in, README and the Wiki; `public/assets/logo-transparent.png` keeps the prepared transparent variant.
 
-## Generation
+`public/assets/logo-mark.svg` displays only the symbol using an SVG viewport over the embedded transparent PNG (1678 × 937 pixels, viewBox `172 164 615 615`). It does not redraw or regenerate the artwork. It is used in the sidebar, chat avatars and favicon. Both assets have a transparent background in light and dark themes; no background tile is added. The dark theme applies a CSS brightness filter so the charcoal lettering and corner details remain visible; the PNG itself retains its colors. Asset URLs use `v=viewport-transparent-1` to refresh cached logos.
 
-Created with the built-in image generation tool. The selected PNG is included in the repository; no third-party client assets were copied.
+The public product name is **Codex Viewport**; the npm package, repository and local Docker image are `codex-viewport`. Published containers use `ghcr.io/tweak90/codex-viewport-ui`. Configuration uses `CODEX_VIEWPORT_LANGUAGE`, `CODEX_VIEWPORT_IMAGE` and `CODEX_VIEWPORT_VOLUME`; new uploads use `.codex-viewport/uploads/`. The operator must explicitly reuse an existing data volume when upgrading. See the 1.1.0 release notes for migration details. Historical Git commits and already published releases remain available.
 
-## Prompt
-
-Use case: logo-brand. Asset type: original application logo proposal for Codex-Web, an independent self-hosted browser interface for remote Codex projects and chats. Create one polished, distinctive mark only, square composition, centered, generous transparent margin, genuinely transparent background. Flat vector-like shapes, precise geometry, professional developer-tool identity, readable as a small app icon. No mockup, no sheet of options, no background tile, no caption, no watermark, no OpenAI knot, no existing product logos. Direction 1 — CONSOLE: an expressive compact terminal prompt symbol integrated into an open browser-window corner. Create a strong original silhouette with an angular prompt and a short cursor, clean negative space and slightly softened corners. Restrained cool blue with a small cyan accent. Avoid interlocking chevrons and ribbon forms. No text.
+Compatibility remains verified with Codex 0.166.0. The web client connects exclusively to an external App Server over WebSocket.

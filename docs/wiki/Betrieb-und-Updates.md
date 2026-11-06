@@ -4,25 +4,25 @@
 
 ## Persistente Daten
 
-Der Web-Container benötigt das Volume `console-data` unter `/data`. Es enthält Anmeldung, Sitzungen, Projektzuordnungen, Nachrichtenentwürfe, Einstellungen, offene Rückfragen und Suchindex. Der tatsächliche Docker-Volumename hängt vom Compose-Projektnamen ab.
+Der Web-Container benötigt das Volume `viewport-data` unter `/data`. Es enthält Anmeldung, Sitzungen, Projektzuordnungen, Nachrichtenentwürfe, Einstellungen, offene Rückfragen und Suchindex. Der tatsächliche Docker-Volumename wird mit `CODEX_VIEWPORT_VOLUME` gewählt (Standard: `codex-viewport-data`).
 
-Chats und Projektdateien liegen auf dem Codex-Host. Uploads werden dort unter `.codex-web/uploads/` im jeweiligen Projekt gespeichert. Das Schließen des Browsers oder Neustarten des Web-Containers beendet keine Codex-Aufgabe auf diesem Host.
+Chats und Projektdateien liegen auf dem Codex-Host. Uploads werden dort unter `.codex-viewport/uploads/` im jeweiligen Projekt gespeichert. Das Schließen des Browsers oder Neustarten des Web-Containers beendet keine Codex-Aufgabe auf diesem Host.
 
 ## Fertiges Docker-Image aktualisieren
 
 Für den Container aus der Installationsanleitung zuerst das neue Image laden, dann den Container unter Beibehaltung des Volumes ersetzen:
 
 ```bash
-docker pull ghcr.io/tweak90/codex-web-ui:latest
-docker stop codex-web
-docker rm codex-web
-docker run -d --name codex-web --restart unless-stopped --init \
+docker pull ghcr.io/tweak90/codex-viewport-ui:latest
+docker stop codex-viewport
+docker rm codex-viewport
+docker run -d --name codex-viewport --restart unless-stopped --init \
   -p 8787:8787 --env-file .env.web \
-  -v codex-web-data:/data \
-  ghcr.io/tweak90/codex-web-ui:latest
+  -v codex-viewport-data:/data \
+  ghcr.io/tweak90/codex-viewport-ui:latest
 ```
 
-Keine Option zum Löschen von Volumes verwenden. `.env.web` und `codex-web-data` müssen dieselben sein wie bei der Einrichtung. Nach dem Start die Browserseite neu laden.
+Keine Option zum Löschen von Volumes verwenden. `.env.web` und `codex-viewport-data` müssen dieselben sein wie bei der Einrichtung. Nach dem Start die Browserseite neu laden.
 
 Für Compose:
 
@@ -31,7 +31,7 @@ docker compose -f compose.image.yml pull
 docker compose -f compose.image.yml up -d
 ```
 
-`latest` ist ein veränderliches Tag. Ein explizites `pull` lädt die aktuelle Fassung; ein laufender Container übernimmt sie erst bei seiner Neuerstellung. Ein festes Versionstag bleibt bei dieser Version. Die Versionsanzeige in Codex-Web prüft Releases und führt selbst keine Updates aus.
+`latest` ist ein veränderliches Tag. Ein explizites `pull` lädt die aktuelle Fassung; ein laufender Container übernimmt sie erst bei seiner Neuerstellung. Ein festes Versionstag bleibt bei dieser Version. Die Versionsanzeige in Codex Viewport prüft Releases und führt selbst keine Updates aus.
 
 Passwort und Einstellungen bleiben im Datenvolume. Werte aus den Einstellungen haben weiterhin Vorrang vor geänderten ENV-Werten, bis das betreffende Feld geleert beziehungsweise auf **Standard verwenden** zurückgesetzt wird.
 

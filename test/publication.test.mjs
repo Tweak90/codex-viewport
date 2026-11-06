@@ -46,7 +46,7 @@ test("publication guard accepts reserved examples and public project metadata", 
 });
 
 test("publication history check detects data removed from the working tree", async (t) => {
-  const root = await mkdtemp(path.join(tmpdir(), "codex-web-publication-"));
+  const root = await mkdtemp(path.join(tmpdir(), "codex-viewport-publication-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const git = (...args) =>
     execFileSync("git", args, { cwd: root, stdio: "pipe" });
@@ -75,7 +75,7 @@ test("publication history check detects data removed from the working tree", asy
   });
   assert.equal(history.status, 1);
   assert.match(history.stderr, /private-network-address/);
-  const uploads = path.join(root, ".codex-web/uploads");
+  const uploads = path.join(root, ".codex-viewport/uploads");
   await mkdir(uploads, { recursive: true });
   await writeFile(
     path.join(uploads, "attachment.txt"),

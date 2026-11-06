@@ -24,7 +24,7 @@ Vor einer Veröffentlichung werden alle Branches und Tags sowie die daraus erzeu
 - GitHub-Actions-Protokolle und Artefakte sowie Issues, Pull Requests und weitere Git-Referenzen prüfen.
 - GitHub-Repository und Registry-Package besitzen getrennte Zugriffsrechte. Nicht prüfbare Bereiche ausdrücklich im privaten Audit-Bericht nennen.
 
-Projekt-URLs, die GHCR-Paketadresse und öffentliche GitHub-Noreply-Adressen identifizieren das Projekt beziehungsweise seine GitHub-Mitwirkenden. Sie sind keine lokale Installationskonfiguration. Für Forks sind `CODEX_WEB_IMAGE` und `CODEX_RELEASE_REPOSITORY` vorgesehen.
+Projekt-URLs, die GHCR-Paketadresse und öffentliche GitHub-Noreply-Adressen identifizieren das Projekt beziehungsweise seine GitHub-Mitwirkenden. Sie sind keine lokale Installationskonfiguration. Für Forks sind `CODEX_VIEWPORT_IMAGE` und `CODEX_RELEASE_REPOSITORY` vorgesehen.
 
 Das Bereinigen oder Prüfen löst kein Deployment aus. Die Änderung der Repository-Sichtbarkeit ist ein eigener, ausdrücklich freizugebender Schritt.
 

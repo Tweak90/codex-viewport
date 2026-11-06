@@ -1,8 +1,10 @@
-# Codex-Web Wiki – Deutsch
+# Codex Viewport Wiki – Deutsch
+
+**A self-hosted web remote for Codex.**
 
 [English](en-Home.md) · [Sprachauswahl](Home.md)
 
-Codex-Web ist eine selbstgehostete Browseroberfläche für einen vorhandenen Codex App Server. Hier stehen Einrichtung, Bedienung und technische Umsetzung.
+Codex Viewport ist eine selbstgehostete Browseroberfläche für einen vorhandenen Codex App Server. Hier stehen Einrichtung, Bedienung und technische Umsetzung.
 
 > **Das Projekt wurde vollständig mit KI entwickelt. Die Nutzung erfolgt auf eigene Gefahr.**
 
@@ -21,6 +23,6 @@ Codex-Web ist eine selbstgehostete Browseroberfläche für einen vorhandenen Cod
 - [Techstack und Entwicklung](Techstack-und-Entwicklung.md): Bibliotheken, Quellcode und Tests.
 - [Sicherheit und Grenzen](Sicherheit-und-Grenzen.md): Schutzmechanismen und unterstützter Umfang.
 
-Die Beispiele verwenden reservierte `.example`-Hostnamen. Verifiziert ist die Anbindung an Codex 0.166.0; das ist eine Kompatibilitätsangabe zum App Server und keine Versionsnummer von Codex-Web.
+Die Beispiele verwenden reservierte `.example`-Hostnamen. Verifiziert ist die Anbindung an Codex 0.166.0; das ist eine Kompatibilitätsangabe zum App Server und keine Versionsnummer von Codex Viewport.
 
-[Repository](https://github.com/Tweak90/codex-web) · [Releases](https://github.com/Tweak90/codex-web/releases) · [Changelog](https://github.com/Tweak90/codex-web/blob/main/CHANGELOG.md)
+[Repository](https://github.com/Tweak90/codex-viewport) · [Releases](https://github.com/Tweak90/codex-viewport/releases) · [Changelog](https://github.com/Tweak90/codex-viewport/blob/main/CHANGELOG.md)

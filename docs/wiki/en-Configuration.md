@@ -12,7 +12,7 @@ The web container connects exclusively to an external Codex API over WebSocket. 
 | `CODEX_API_TOKEN` | Bearer token if required by that API | Empty |
 | `HOST_LABEL` | Codex host name displayed in the UI | `Codex-Host` |
 | `CODEX_PROJECTS_ROOT` | Base directory for new projects on the Codex host | Derived from Codex metadata, ending in `codex-projects` |
-| `CODEX_WEB_LANGUAGE` | Language without a saved override | `en`; alternatively `de` |
+| `CODEX_VIEWPORT_LANGUAGE` | Language without a saved override | `en`; alternatively `de` |
 | `CODEX_SEND_WITH` | Send key without a saved override | `shiftEnter`; alternatively `enter` |
 | `CODEX_FOLLOWUP_MODE` | Follow-ups during active work | `steer`; alternatively `queue` |
 | `CODEX_RELEASE_REPOSITORY` | Release notification repository in `owner/repo` format | This project |
@@ -41,7 +41,8 @@ Overrides persist in `settings.json` in the data volume. Unsupported settings le
 | Variable | Purpose | Default |
 | --- | --- | --- |
 | `WEB_BIND_IP` / `WEB_PORT` | Published Docker browser address and port | `0.0.0.0` / `8787` |
-| `CODEX_WEB_IMAGE` | Image used by `compose.image.yml` | `ghcr.io/tweak90/codex-web-ui:latest` |
+| `CODEX_VIEWPORT_IMAGE` | Image used by `compose.image.yml` | `ghcr.io/tweak90/codex-viewport-ui:latest` |
+| `CODEX_VIEWPORT_VOLUME` | Persistent Docker volume; reuse the existing volume when upgrading | `codex-viewport-data` |
 | `DATA_DIR` | Web data directory for direct Node startup | `.data`; `/data` in Docker |
 | `PORT` / `BIND_ADDRESS` | Node HTTP listener | `8787` / `0.0.0.0` |
 

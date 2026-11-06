@@ -955,7 +955,7 @@ function itemHtml(item) {
     return `<article class="message user"><div class="message-label">${I18N.t("Du")}</div><div class="message-body">${escapeHtml(text)}${itemImageCards(item)}</div></article>`;
   }
   if (item.type === "agentMessage" || item.type === "plan")
-    return `<article class="message assistant"><div class="message-label"><img class="avatar" src="/assets/logo.png?v=blue-terminal" alt=""> ${item.type === "plan" ? "Plan" : "Codex"}</div><div class="message-body">${outputPreview(item.text || "", item.id, true)}${itemImageCards(item, md(item.text || ""))}${globalThis.codexQuestions?.cards(item) || ""}</div></article>`;
+    return `<article class="message assistant"><div class="message-label"><img class="avatar" src="/assets/logo-mark.svg?v=viewport-transparent-1" alt=""> ${item.type === "plan" ? "Plan" : "Codex"}</div><div class="message-body">${outputPreview(item.text || "", item.id, true)}${itemImageCards(item, md(item.text || ""))}${globalThis.codexQuestions?.cards(item) || ""}</div></article>`;
   let title, text;
   if (item.type === "reasoning") {
     title = I18N.t("Überlegt");
@@ -1458,7 +1458,7 @@ function showAuth(info) {
     dialog.close();
   state.setupRequired = !info.configured;
   $("auth-title").textContent = state.setupRequired
-    ? I18N.t("Dein Zugang zu Codex-Web")
+    ? I18N.t("Dein Zugang zu Codex Viewport")
     : I18N.t("Willkommen zurück");
   $("auth-description").textContent = state.setupRequired
     ? I18N.t("Lege beim ersten Start dein Passwort fest. Mindestens 4 Zeichen.")

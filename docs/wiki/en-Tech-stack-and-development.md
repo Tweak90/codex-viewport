@@ -60,7 +60,7 @@ Browser tests start a mock-backed server and temporary project tree. They do not
 
 ```bash
 docker compose --env-file .env.example config --quiet
-docker build -t codex-vm-console:dev .
+docker build -t codex-viewport:dev .
 ```
 
 Release tags run the checks and publish versioned and `latest` images. Release downloads also include a Docker archive and checksums. Publishing is separate from deployment.
@@ -72,11 +72,11 @@ Full GitHub event payloads are excluded from build provenance, metadata output a
 Wiki sources live in `docs/wiki/`. `npm run check:docs` validates internal page links. For an initialized GitHub Wiki:
 
 ```bash
-git clone https://github.com/Tweak90/codex-web.wiki.git ../codex-web.wiki
-node scripts/sync-wiki.mjs ../codex-web.wiki
-git -C ../codex-web.wiki add --all
-git -C ../codex-web.wiki commit -m "Update documentation"
-git -C ../codex-web.wiki push
+git clone https://github.com/Tweak90/codex-viewport.wiki.git ../codex-viewport.wiki
+node scripts/sync-wiki.mjs ../codex-viewport.wiki
+git -C ../codex-viewport.wiki add --all
+git -C ../codex-viewport.wiki commit -m "Update documentation"
+git -C ../codex-viewport.wiki push
 ```
 
 Keep the checkout outside the app or in an ignored local directory. The exporter removes `.md` from local page links for GitHub Wiki; repository sources keep normal Markdown file links.

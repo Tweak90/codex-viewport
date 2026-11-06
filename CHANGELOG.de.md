@@ -2,6 +2,11 @@
 
 [English](CHANGELOG.md)
 
+## 1.1.0 — 2026-11-06
+
+- Anwendung in Oberfläche, Metadaten und Dokumentation in Codex Viewport umbenannt; Untertitel: „A self-hosted web remote for Codex.“
+- Freigestellte Version des Nutzerlogos in Anmeldung, Dokumentation, kompakten UI-Icons und Favicon eingebunden; Logo-URLs aktualisieren zwischengespeicherte Bilder automatisch. Repository, Docker-Images, Konfigurationsvariablen und neue Uploadpfade verwenden die Codex-Viewport-Bezeichner; beim Update muss das bisherige Datenvolume ausdrücklich weiterverwendet werden.
+
 ## 1.0.2 — 2026-11-05
 
 - Einstellungszahnrad unter den 5-Stunden- und Wochen-Prozentwerten der schmalen Aktivitätsleiste wiederhergestellt.
@@ -24,7 +29,7 @@
 
 ## 1.0.0 — 2026-11-05
 
-Erste Veröffentlichung der eigenständigen Codex-Web-Oberfläche.
+Erste Veröffentlichung der eigenständigen Codex Viewport-Oberfläche.
 
 - Anbindung an eine vorhandene Codex-App-Server-API.
 - Passwortanmeldung, echte Projektordner, mehrere Chats, Archiv, Suche und gespeicherte Entwürfe.

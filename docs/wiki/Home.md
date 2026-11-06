@@ -1,6 +1,8 @@
-<p align="center"><img src="https://raw.githubusercontent.com/Tweak90/codex-web/main/public/assets/logo.png?v=blue-terminal" width="112" alt="Codex-Web logo"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/Tweak90/codex-viewport/main/public/assets/logo.png?v=viewport-transparent-1" width="420" alt="Codex Viewport logo"></p>
 
-# Codex-Web Wiki
+# Codex Viewport Wiki
+
+**A self-hosted web remote for Codex.**
 
 Your Codex projects, chats and tools in a self-hosted browser interface.
 
@@ -18,12 +20,12 @@ Choose your language · Sprache auswählen
 | [Architecture and APIs](en-Architecture.md) | [Architektur und APIs](Architektur.md) |
 | [Tech stack and development](en-Tech-stack-and-development.md) | [Techstack und Entwicklung](Techstack-und-Entwicklung.md) |
 
-Codex-Web connects to an existing Codex App Server. Docker hosts the web interface; Codex sign-in and project files remain on your Codex host. Start with the installation guide for your language.
+Codex Viewport connects to an existing Codex App Server. Docker hosts the web interface; Codex sign-in and project files remain on your Codex host. Start with the installation guide for your language.
 
-Codex-Web verbindet sich mit einem vorhandenen Codex App Server. Die Weboberfläche läuft in Docker; Codex-Anmeldung und Projektdateien bleiben auf dem Codex-Host. Die Installationsanleitung führt durch die Einrichtung.
+Codex Viewport verbindet sich mit einem vorhandenen Codex App Server. Die Weboberfläche läuft in Docker; Codex-Anmeldung und Projektdateien bleiben auf dem Codex-Host. Die Installationsanleitung führt durch die Einrichtung.
 
 > **This project was built entirely with AI. Use it at your own risk.**
 >
 > **Dieses Projekt wurde vollständig mit KI entwickelt. Die Nutzung erfolgt auf eigene Gefahr.**
 
-[Repository](https://github.com/Tweak90/codex-web) · [Releases](https://github.com/Tweak90/codex-web/releases)
+[Repository](https://github.com/Tweak90/codex-viewport) · [Releases](https://github.com/Tweak90/codex-viewport/releases)

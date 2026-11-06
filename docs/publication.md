@@ -30,6 +30,6 @@ Deleting references or image versions may leave old Git commits or registry blob
 
 Set the repository variable `PUBLISH_CONTAINER=false` to pause container publication while retaining source and release downloads. This prevents the tag workflow from republishing an image during a privacy cleanup. The package audit's withdrawal mode removes the package's public entry point; check the old object URLs afterward. A later public restart must review history, caches and registry namespaces again.
 
-Public project URLs, package addresses and GitHub noreply attribution identify the project and its contributors. They are not deployment configuration. Forks can set `CODEX_WEB_IMAGE` and `CODEX_RELEASE_REPOSITORY`.
+Public project URLs, package addresses and GitHub noreply attribution identify the project and its contributors. They are not deployment configuration. Forks can set `CODEX_VIEWPORT_IMAGE` and `CODEX_RELEASE_REPOSITORY`.
 
 Review and cleanup do not deploy the application. Repository and package visibility changes require explicit authorization.

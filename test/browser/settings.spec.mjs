@@ -37,7 +37,7 @@ test("gear settings persist English and Enter behavior, preserve user names and 
     await expect(page.locator("#application-settings-dialog")).toBeVisible();
     await expect(page.locator("#settings-panel-general")).toBeVisible();
     await expect(page.locator("#setting-CODEX_WS_URL")).not.toBeVisible();
-    await page.locator("#setting-CODEX_WEB_LANGUAGE").selectOption("en");
+    await page.locator("#setting-CODEX_VIEWPORT_LANGUAGE").selectOption("en");
     await page.locator("#setting-CODEX_SEND_WITH").selectOption("enter");
     await page.locator('[data-settings-tab="codex"]').click();
     await page.locator("#setting-HOST_LABEL").fill("Custom browser host");
@@ -65,7 +65,7 @@ test("gear settings persist English and Enter behavior, preserve user names and 
     await page.locator('[data-settings-tab="codex"]').click();
     await page.locator('[data-setting-reset="HOST_LABEL"]').click();
     await page.locator('[data-settings-tab="general"]').click();
-    await page.locator('[data-setting-reset="CODEX_WEB_LANGUAGE"]').click();
+    await page.locator('[data-setting-reset="CODEX_VIEWPORT_LANGUAGE"]').click();
     await expect(page.locator("#settings-panel-general")).toBeVisible();
     await expect(page.locator("#settings-panel-general")).toContainText("Choose which key combination");
     await page.locator('[data-setting-reset="CODEX_SEND_WITH"]').click();
@@ -82,7 +82,7 @@ test("gear settings persist English and Enter behavior, preserve user names and 
     await expect(page.locator("#info-dialog")).toBeVisible();
     await page.keyboard.press("Escape");
   } finally {
-    await api(page, "/api/settings", { values: { HOST_LABEL: "", CODEX_WEB_LANGUAGE: "", CODEX_SEND_WITH: "" } }, "PATCH");
+    await api(page, "/api/settings", { values: { HOST_LABEL: "", CODEX_VIEWPORT_LANGUAGE: "", CODEX_SEND_WITH: "" } }, "PATCH");
     await cleanup(page, p);
   }
 });

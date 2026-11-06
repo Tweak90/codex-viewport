@@ -31,4 +31,4 @@ jobs:
           CODEX_WS_URL=ws://codex-host.example:4500 docker compose --env-file /dev/null config --quiet
           CODEX_WS_URL=ws://codex-host.example:4500 CODEX_API_TOKEN=ci-validation docker compose --env-file /dev/null -f compose.image.yml config --quiet
       - name: Build Docker image
-        run: docker build -t codex-vm-console:ci .
+        run: docker build -t codex-viewport:ci .

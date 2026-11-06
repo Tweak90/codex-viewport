@@ -78,8 +78,8 @@ export class FakeBridge extends EventEmitter {
     if (method === "fs/remove") {
       assert.ok(
         p.path.startsWith(this.root + "/") ||
-          path.basename(p.path).startsWith("codex-web-download-") ||
-          path.basename(p.path).startsWith("codex-web-upload-"),
+          path.basename(p.path).startsWith("codex-viewport-download-") ||
+          path.basename(p.path).startsWith("codex-viewport-upload-"),
       );
       await rm(p.path, { recursive: p.recursive, force: p.force });
       return {};

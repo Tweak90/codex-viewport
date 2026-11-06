@@ -2,6 +2,11 @@
 
 [Deutsch](CHANGELOG.de.md)
 
+## 1.1.0 — 2026-11-06
+
+- Renamed the application to Codex Viewport with the tagline “A self-hosted web remote for Codex.” across the UI, metadata and documentation.
+- Integrated the transparent version of the user-supplied logo across sign-in, documentation, compact UI icons and the favicon; cached logo URLs refresh automatically. Repository, Docker images, configuration variables and new upload paths now use Codex Viewport identifiers; upgrades must explicitly retain the existing data volume.
+
 ## 1.0.2 — 2026-11-05
 
 - Settings gear restored below the 5-hour and weekly percentages in the narrow activity bar.
@@ -16,7 +21,7 @@
 - Activity-bar allowance shortcut displays only remaining 5-hour and weekly percentages.
 - Settings appear only in the left sidebar, above usage limits, with General, Codex and Updates categories.
 - Clear field descriptions, collapsible ENV details, keyboard navigation and a fixed Save/Cancel footer preserve edits across categories.
-- Codex-Web connects exclusively to the external WebSocket API; local transport, host-side launch tools and their configuration/examples were removed. Retired saved settings migrate automatically.
+- Codex Viewport connects exclusively to the external WebSocket API; local transport, host-side launch tools and their configuration/examples were removed. Retired saved settings migrate automatically.
 - Project Agents tab shows active and previous agents, archived histories, search/status filters, parent chats and paginated output without starting work.
 - New blue terminal logo has a transparent background throughout the UI, chat, favicon and documentation; cached UI references refresh automatically.
 - Open select menus use readable foreground/background colors in both themes.
@@ -24,7 +29,7 @@
 
 ## 1.0.0 — 2026-11-05
 
-First release of the independent Codex-Web browser interface.
+First release of the independent Codex Viewport browser interface.
 
 - Connection to an existing Codex App Server API.
 - Password sign-in, projects with real folders, multiple chats, archive, search and saved drafts.

@@ -92,7 +92,7 @@ export async function createConsoleServer({
     bridge.status.transport = "websocket";
   }
   hostLabel = settings.value("HOST_LABEL");
-  const preferences = () => ({ language: settings.value("CODEX_WEB_LANGUAGE"), sendWith: settings.value("CODEX_SEND_WITH"), followupMode: settings.value("CODEX_FOLLOWUP_MODE") });
+  const preferences = () => ({ language: settings.value("CODEX_VIEWPORT_LANGUAGE"), sendWith: settings.value("CODEX_SEND_WITH"), followupMode: settings.value("CODEX_FOLLOWUP_MODE") });
   const projects = await ProjectStore.load(dataDir, bridge, settings.value("CODEX_PROJECTS_ROOT"));
   const workbench = await createWorkbench({
     releaseFetcher,
@@ -398,6 +398,7 @@ export async function createConsoleServer({
         ],
         "/style.css": ["public/style.css", "text/css; charset=utf-8"],
         "/assets/logo.png": ["public/assets/logo.png", "image/png"],
+        "/assets/logo-mark.svg": ["public/assets/logo-mark.svg", "image/svg+xml"],
         "/vendor/marked.js": [
           "node_modules/marked/lib/marked.umd.js",
           "text/javascript",
@@ -419,7 +420,7 @@ export async function createConsoleServer({
       res.end(content);
     } catch (error) {
       if (!res.headersSent)
-        json(res, error.status || 502, { error: translate(error.message, settings.value("CODEX_WEB_LANGUAGE")) });
+        json(res, error.status || 502, { error: translate(error.message, settings.value("CODEX_VIEWPORT_LANGUAGE")) });
       else res.end();
     }
   });
@@ -516,7 +517,7 @@ if (
   app.server.listen(
     Number(process.env.PORT || 8787),
     process.env.BIND_ADDRESS || "0.0.0.0",
-    () => console.log(`Codex-Web listening on :${app.server.address().port}`),
+    () => console.log(`Codex Viewport listening on :${app.server.address().port}`),
   );
   process.on("SIGTERM", async () => {
     bridge.close();

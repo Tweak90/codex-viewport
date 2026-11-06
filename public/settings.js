@@ -1,12 +1,12 @@
 "use strict";
 (() => {
   const groups = [
-    { id: "general", title: () => I18N.t("Allgemeine Einstellungen"), description: () => I18N.t("Sprache, Sendetaste und Folgenachrichten."), fields: ["CODEX_WEB_LANGUAGE", "CODEX_SEND_WITH", "CODEX_FOLLOWUP_MODE"] },
+    { id: "general", title: () => I18N.t("Allgemeine Einstellungen"), description: () => I18N.t("Sprache, Sendetaste und Folgenachrichten."), fields: ["CODEX_VIEWPORT_LANGUAGE", "CODEX_SEND_WITH", "CODEX_FOLLOWUP_MODE"] },
     { id: "codex", title: () => I18N.t("Codex-Einstellungen"), description: () => I18N.t("Codex-Host, Verbindung und Speicherort für neue Projekte."), fields: ["HOST_LABEL", "CODEX_WS_URL", "CODEX_API_TOKEN", "CODEX_PROJECTS_ROOT"] },
     { id: "updates", title: () => I18N.t("Updates"), description: () => I18N.t("GitHub-Releases und Informationen zu dieser Weboberfläche."), fields: ["CODEX_RELEASE_REPOSITORY", "CODEX_GITHUB_TOKEN"] },
   ];
   const help = {
-    CODEX_WEB_LANGUAGE: () => I18N.t("Sprache für Menüs und Bedienelemente. Chatnachrichten werden nicht übersetzt."),
+    CODEX_VIEWPORT_LANGUAGE: () => I18N.t("Sprache für Menüs und Bedienelemente. Chatnachrichten werden nicht übersetzt."),
     HOST_LABEL: () => I18N.t("Dieser Name wird in der Oberfläche für deinen Codex-Host angezeigt."),
     CODEX_SEND_WITH: () => I18N.t("Wähle, welche Tastenkombination sendet und welche einen Zeilenumbruch einfügt."),
     CODEX_FOLLOWUP_MODE: () => I18N.t("Steuern gibt eine Nachricht direkt an die laufende Aufgabe weiter. Die Warteschlange wartet, bis die Aufgabe beendet ist."),

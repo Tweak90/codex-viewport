@@ -70,7 +70,7 @@ Die Browserprüfungen starten einen eigenen mockbasierten Server und temporäre 
 
 ```bash
 docker compose --env-file .env.example config --quiet
-docker build -t codex-vm-console:dev .
+docker build -t codex-viewport:dev .
 ```
 
 Ein Versionstag löst den Release-Workflow aus. Er führt Tests aus und veröffentlicht das Image unter Versions- und `latest`-Tags. Manuelle Release-Downloads enthalten zusätzlich ein Docker-Archiv und Prüfsummen. Das ist von einem Deployment getrennt.
@@ -80,11 +80,11 @@ Ein Versionstag löst den Release-Workflow aus. Er führt Tests aus und veröffe
 Die Wiki-Quellen liegen unter `docs/wiki/`. `npm run check:docs` prüft interne Seitenlinks. Für ein bereits initialisiertes GitHub-Wiki dessen Git-Repository auschecken und die Seiten exportieren:
 
 ```bash
-git clone https://github.com/Tweak90/codex-web.wiki.git ../codex-web.wiki
-node scripts/sync-wiki.mjs ../codex-web.wiki
-git -C ../codex-web.wiki add --all
-git -C ../codex-web.wiki commit -m "Update documentation"
-git -C ../codex-web.wiki push
+git clone https://github.com/Tweak90/codex-viewport.wiki.git ../codex-viewport.wiki
+node scripts/sync-wiki.mjs ../codex-viewport.wiki
+git -C ../codex-viewport.wiki add --all
+git -C ../codex-viewport.wiki commit -m "Update documentation"
+git -C ../codex-viewport.wiki push
 ```
 
 Das Wiki-Repository muss außerhalb der Anwendung oder in einem ignorierten lokalen Verzeichnis liegen. Das Exportskript entfernt die `.md`-Endung aus internen Wiki-Seitenlinks; im Hauptrepository bleiben sie als normale Dateilinks nutzbar.

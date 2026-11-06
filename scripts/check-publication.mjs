@@ -48,7 +48,7 @@ export function inspectPublicationData(data, filename) {
 }
 
 const excludedPath = (name) =>
-  /(^|\/)(?:\.env(?:\..*)?|\.data|\.codex-web|ssh|dist|test-results|playwright-report)(?:\/|$)/.test(
+  /(^|\/)(?:\.env(?:\..*)?|\.data|\.codex-[^/]+|ssh|dist|test-results|playwright-report)(?:\/|$)/.test(
     name,
   ) && name !== ".env.example";
 

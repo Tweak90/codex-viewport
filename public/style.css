@@ -1271,6 +1271,8 @@ dialog label > select {
 .auth-card > img {
   align-self: center;
   object-fit: contain;
+  width: 100%;
+  height: auto;
 }
 .auth-card .eyebrow {
   text-align: center;
@@ -2226,6 +2228,7 @@ select:focus {
 .brand-logo {
   width: 28px;
   height: 28px;
+  flex-shrink: 0;
 }
 .brand small {
   font-size: 8px;
@@ -3209,3 +3212,10 @@ button:hover,
 .message-queue { margin: 0 20px 10px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 5px; color: var(--muted); }
 .message-queue ul { max-height: 120px; overflow-y: auto; padding-left: 20px; margin-bottom: 0; }
 .message-queue li { overflow-wrap: anywhere; }
+
+/* Keep the charcoal details of the transparent logo visible on dark panels. */
+[data-theme="dark"] .auth-card > img,
+[data-theme="dark"] .brand-logo,
+[data-theme="dark"] .message-label img.avatar {
+  filter: brightness(2);
+}

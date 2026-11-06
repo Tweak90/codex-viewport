@@ -2,7 +2,7 @@
 
 [Deutsch](Installation.md) · [English home](en-Home.md)
 
-Codex-Web is a Docker web client for an **existing external Codex App Server API**. It connects exclusively over `ws://` or `wss://`. Codex sign-in, project files and tools stay on the Codex host. Install this project on the web host; it does not start or bundle a Codex process.
+Codex Viewport is a Docker web client for an **existing external Codex App Server API**. It connects exclusively over `ws://` or `wss://`. Codex sign-in, project files and tools stay on the Codex host. Install this project on the web host; it does not start or bundle a Codex process.
 
 ## Requirements
 
@@ -26,12 +26,12 @@ HOST_LABEL=Codex-Host
 Replace the example host and token with your API endpoint's values. Leave `CODEX_API_TOKEN` empty if that endpoint does not require a token.
 
 ```bash
-docker volume create codex-web-data
-docker pull ghcr.io/tweak90/codex-web-ui:latest
-docker run -d --name codex-web --restart unless-stopped --init \
+docker volume create codex-viewport-data
+docker pull ghcr.io/tweak90/codex-viewport-ui:latest
+docker run -d --name codex-viewport --restart unless-stopped --init \
   -p 8787:8787 --env-file .env.web \
-  -v codex-web-data:/data \
-  ghcr.io/tweak90/codex-web-ui:latest
+  -v codex-viewport-data:/data \
+  ghcr.io/tweak90/codex-viewport-ui:latest
 ```
 
 The public image supports Linux/amd64 and requires no registry sign-in, source checkout or local build. For a restricted fork's image, first use `docker login` with an account that has read access.
@@ -43,8 +43,8 @@ Open `http://web-host.example:8787` and set a browser password of at least four 
 Check out the source on the web host:
 
 ```bash
-git clone https://github.com/Tweak90/codex-web.git
-cd codex-web
+git clone https://github.com/Tweak90/codex-viewport.git
+cd codex-viewport
 cp .env.example .env
 ```
 
@@ -60,7 +60,7 @@ Or build the web image from source:
 docker compose up -d --build
 ```
 
-Both configurations connect to the external API. Both retain web data in `console-data` at `/data`.
+Both configurations connect to the external API. Both retain web data at `/data` in the volume selected by `CODEX_VIEWPORT_VOLUME` (default `codex-viewport-data`).
 
 ## Run Node directly for development
 

@@ -4,25 +4,25 @@
 
 ## Persistent data
 
-The web container mounts its data volume at `/data`. It stores authentication, sessions, project assignments, drafts, settings, question state, queue ownership and the search index. The Docker CLI example uses `codex-web-data`; Compose uses `console-data` with a project-dependent volume prefix.
+The web container mounts its data volume at `/data`. It stores authentication, sessions, project assignments, drafts, settings, question state, queue ownership and the search index. The Docker CLI example uses `codex-viewport-data`; Compose uses `viewport-data` with the explicit name selected by `CODEX_VIEWPORT_VOLUME`.
 
-Native chats and project files stay on the Codex host. Uploads are stored under `.codex-web/uploads/` inside the project. Closing the browser or restarting the web container does not stop a Codex task on that host.
+Native chats and project files stay on the Codex host. Uploads are stored under `.codex-viewport/uploads/` inside the project. Closing the browser or restarting the web container does not stop a Codex task on that host.
 
 ## Update a published-image container
 
 For the Docker CLI installation, pull the image and replace the container while keeping its environment file and volume:
 
 ```bash
-docker pull ghcr.io/tweak90/codex-web-ui:latest
-docker stop codex-web
-docker rm codex-web
-docker run -d --name codex-web --restart unless-stopped --init \
+docker pull ghcr.io/tweak90/codex-viewport-ui:latest
+docker stop codex-viewport
+docker rm codex-viewport
+docker run -d --name codex-viewport --restart unless-stopped --init \
   -p 8787:8787 --env-file .env.web \
-  -v codex-web-data:/data \
-  ghcr.io/tweak90/codex-web-ui:latest
+  -v codex-viewport-data:/data \
+  ghcr.io/tweak90/codex-viewport-ui:latest
 ```
 
-Keep `.env.web` and the same `codex-web-data` volume. Do not use volume-deletion options. Reload the browser after startup.
+Keep `.env.web` and the same `codex-viewport-data` volume. Do not use volume-deletion options. Reload the browser after startup.
 
 For Compose:
 
@@ -31,7 +31,7 @@ docker compose -f compose.image.yml pull
 docker compose -f compose.image.yml up -d
 ```
 
-`latest` is a moving tag. Pulling obtains its current image; the running container uses it after recreation. A fixed version tag stays on that release. Codex-Web's version check reads release metadata and does not deploy anything.
+`latest` is a moving tag. Pulling obtains its current image; the running container uses it after recreation. A fixed version tag stays on that release. Codex Viewport's version check reads release metadata and does not deploy anything.
 
 Saved settings still override ENV after an update. Clear a field or choose **Use default** to restore environment precedence. Keep the volume to retain the password and preferences.
 
@@ -52,7 +52,7 @@ Restore web data under the same volume mount and provide the corresponding host 
 ## Diagnostics and downloads
 
 ```bash
-docker logs --tail=100 codex-web
+docker logs --tail=100 codex-viewport
 # For Compose:
 docker compose -f compose.image.yml ps
 docker compose -f compose.image.yml logs --tail=100 web

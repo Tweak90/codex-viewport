@@ -27,15 +27,15 @@ const png = Buffer.from(
   "base64",
 );
 async function fixture(t) {
-  const root = await mkdtemp(path.join(os.tmpdir(), "codex-web-test-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "codex-viewport-test-"));
   await mkdir(path.join(root, "home/.codex"), { recursive: true });
   const bridge = new FakeBridge(root),
     dataDir = path.join(root, "data"),
     projectRoot = path.join(root, "home/projects");
   const app = await createConsoleServer({
     bridge, dataDir, projectRoot,
-    environment: { ...process.env, CODEX_WEB_LANGUAGE: "de" },
-    releaseFetcher: async () => ({ ok: true, status: 200, json: async () => ({ tag_name: "v9.0.0", html_url: "https://github.com/example/codex-web/releases/tag/v9.0.0", published_at: "2026-11-05T12:00:00Z" }) }),
+    environment: { ...process.env, CODEX_VIEWPORT_LANGUAGE: "de" },
+    releaseFetcher: async () => ({ ok: true, status: 200, json: async () => ({ tag_name: "v9.0.0", html_url: "https://github.com/example/codex-viewport/releases/tag/v9.0.0", published_at: "2026-11-05T12:00:00Z" }) }),
   });
   app.server.listen(0, "127.0.0.1");
   await once(app.server, "listening");
@@ -971,7 +971,7 @@ test("project file management, binary uploads and ZIP downloads stay within the 
   });
   assert.equal(response.status, 201);
   const uploaded = await response.json();
-  assert.ok(uploaded.path.startsWith(p.path + "/.codex-web/uploads/"));
+  assert.ok(uploaded.path.startsWith(p.path + "/.codex-viewport/uploads/"));
   assert.equal(uploaded.name, "bild.png");
   assert.equal(uploaded.image, true);
   assert.equal(Buffer.compare(await readFile(uploaded.path), png), 0);
@@ -1002,7 +1002,7 @@ test("project file management, binary uploads and ZIP downloads stay within the 
   const staged = f.bridge.calls.filter(
     (call) =>
       call.method === "fs/remove" &&
-      path.basename(call.params.path).startsWith("codex-web-upload-"),
+      path.basename(call.params.path).startsWith("codex-viewport-upload-"),
   );
   assert.equal(staged.length, 1);
   await assert.rejects(stat(staged[0].params.path), { code: "ENOENT" });
@@ -1241,7 +1241,7 @@ test("application settings are protected, validate changes and apply ENV overrid
   await f.login();
   assert.equal((await f.request("/api/settings", { method: "PATCH", body: { values: { HOST_LABEL: "Other" } }, noCsrf: true })).status, 403);
   const root = path.join(f.root, "home/configured-projects");
-  const changed = await f.request("/api/settings", { method: "PATCH", body: { values: { HOST_LABEL: "Saved host", CODEX_PROJECTS_ROOT: root, CODEX_GITHUB_TOKEN: "example-settings-token", CODEX_WEB_LANGUAGE: "en", CODEX_SEND_WITH: "enter" } } });
+  const changed = await f.request("/api/settings", { method: "PATCH", body: { values: { HOST_LABEL: "Saved host", CODEX_PROJECTS_ROOT: root, CODEX_GITHUB_TOKEN: "example-settings-token", CODEX_VIEWPORT_LANGUAGE: "en", CODEX_SEND_WITH: "enter" } } });
   assert.equal(changed.status, 200);
   assert.equal(JSON.stringify(changed.body).includes("example-settings-token"), false);
   assert.equal((await f.request("/api/state")).body.hostLabel, "Saved host");

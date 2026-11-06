@@ -1,7 +1,7 @@
-name: codex-web
+name: codex-viewport
 services:
   web:
-    image: ${CODEX_WEB_IMAGE:-ghcr.io/tweak90/codex-web-ui:latest}
+    image: ${CODEX_VIEWPORT_IMAGE:-ghcr.io/tweak90/codex-viewport-ui:latest}
     pull_policy: always
     restart: unless-stopped
     init: true
@@ -10,7 +10,7 @@ services:
     environment:
       CODEX_WS_URL: ${CODEX_WS_URL:-}
       CODEX_API_TOKEN: ${CODEX_API_TOKEN:-}
-      CODEX_WEB_LANGUAGE: ${CODEX_WEB_LANGUAGE:-}
+      CODEX_VIEWPORT_LANGUAGE: ${CODEX_VIEWPORT_LANGUAGE:-}
       CODEX_FOLLOWUP_MODE: ${CODEX_FOLLOWUP_MODE:-}
       CODEX_SEND_WITH: ${CODEX_SEND_WITH:-}
       HOST_LABEL: ${HOST_LABEL:-}
@@ -20,6 +20,7 @@ services:
     labels:
       com.centurylinklabs.watchtower.enable: "false"
     volumes:
-      - console-data:/data
+      - viewport-data:/data
 volumes:
-  console-data:
+  viewport-data:
+    name: ${CODEX_VIEWPORT_VOLUME:-codex-viewport-data}

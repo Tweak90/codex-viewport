@@ -387,7 +387,10 @@ test("quota dialog renders its full shell immediately, then fills values without
   await expect(page.locator("#activity-usage-weekly")).toHaveText("90%");
   await expect(page.locator("#reset-count")).toHaveText("2");
   await expect(page.locator("#info-content")).not.toContainText("hasCredits");
+  const refreshedUsage = page.waitForResponse(response => new URL(response.url()).pathname === "/api/usage");
   await page.locator("#usage-refresh").click();
+  await refreshedUsage;
+  await expect(page.locator("#info-content")).toHaveAttribute("aria-busy", "false");
   await expect(page.locator("#info-content")).toContainText("75% verfügbar");
   await page.evaluate(() => handleEvent({ method: "account/rateLimits/updated", params: { rateLimits: { primary: { usedPercent: 40, windowDurationMins: 300 }, secondary: { usedPercent: 80, windowDurationMins: 10080 } } } }));
   await expect(page.locator("#activity-usage-primary")).toHaveText("60%");

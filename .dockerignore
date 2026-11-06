@@ -3,7 +3,7 @@ node_modules
 .env
 .env.*
 .data
-.codex-web
+.codex-*
 ssh
 dist
 test

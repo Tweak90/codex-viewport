@@ -47,7 +47,7 @@ Native Dateischnittstellen übernehmen Lesen und Schreiben. Verzeichnis-, Git-, 
 
 ## Herkunft und Kompatibilität
 
-Das Projekt wurde vollständig mit KI entwickelt. Oberfläche, Bridge, Tests und Konfiguration wurden für dieses Projekt erstellt. Zur Recherche wurden die offizielle API-Dokumentation und Protokollschemata der installierten Codex-Version verwendet. Die Architektur eines anderen öffentlichen Codex-Web-Projekts wurde zur Einordnung gelesen; daraus wurden keine Quellcodedateien oder UI-Assets übernommen. Das Logo ist ebenfalls KI-generiert; Details stehen in der Branding-Dokumentation des Repositorys.
+Das Projekt wurde vollständig mit KI entwickelt. Oberfläche, Bridge, Tests und Konfiguration wurden für dieses Projekt erstellt. Zur Recherche wurden die offizielle API-Dokumentation und Protokollschemata der installierten Codex-Version verwendet. Die Architektur eines anderen öffentlichen Codex Viewport-Projekts wurde zur Einordnung gelesen; daraus wurden keine Quellcodedateien oder UI-Assets übernommen. Das aktuelle Logo wurde vom Nutzer bereitgestellt; Details stehen in der Branding-Dokumentation des Repositorys.
 
 Verifiziert ist Codex 0.166.0. Änderungen am App-Server-Protokoll erfordern eine erneute Kompatibilitätsprüfung. Die [offizielle Dokumentation](https://learn.chatgpt.com/docs/app-server) beschreibt den App Server und seine Transportschnittstellen.
 

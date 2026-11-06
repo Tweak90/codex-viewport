@@ -1,7 +1,7 @@
-name: codex-console
+name: codex-viewport
 services:
   web:
-    image: codex-vm-console:1.0.2
+    image: codex-viewport:1.1.0
     build: .
     restart: unless-stopped
     init: true
@@ -12,12 +12,13 @@ services:
       CODEX_API_TOKEN: ${CODEX_API_TOKEN:-}
       CODEX_GITHUB_TOKEN: ${CODEX_GITHUB_TOKEN:-}
       CODEX_RELEASE_REPOSITORY: ${CODEX_RELEASE_REPOSITORY:-}
-      CODEX_WEB_LANGUAGE: ${CODEX_WEB_LANGUAGE:-}
+      CODEX_VIEWPORT_LANGUAGE: ${CODEX_VIEWPORT_LANGUAGE:-}
       CODEX_FOLLOWUP_MODE: ${CODEX_FOLLOWUP_MODE:-}
       CODEX_SEND_WITH: ${CODEX_SEND_WITH:-}
       HOST_LABEL: ${HOST_LABEL:-}
       CODEX_PROJECTS_ROOT: ${CODEX_PROJECTS_ROOT:-}
     volumes:
-      - console-data:/data
+      - viewport-data:/data
 volumes:
-  console-data:
+  viewport-data:
+    name: ${CODEX_VIEWPORT_VOLUME:-codex-viewport-data}

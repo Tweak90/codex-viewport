@@ -40,4 +40,4 @@ Official plugin UIs and computer-use views are not fully reproduced. Git commit/
 
 Do not commit personal paths, private addresses, credentials, `.env`, runtime data, uploads or user screenshots, or include them in release archives. Check reachable history, published downloads, container layers and metadata, registry versions, CI logs and build artifacts separately.
 
-Pattern-based checks cannot conclusively exclude unknown or encrypted credentials. Revoke any real exposed key with its provider. Keep private audit reports out of the repository and explicitly record anything that could not be reviewed. See the repository [publication guide](https://github.com/Tweak90/codex-web/blob/main/docs/publication.md).
+Pattern-based checks cannot conclusively exclude unknown or encrypted credentials. Revoke any real exposed key with its provider. Keep private audit reports out of the repository and explicitly record anything that could not be reviewed. See the repository [publication guide](https://github.com/Tweak90/codex-viewport/blob/main/docs/publication.md).

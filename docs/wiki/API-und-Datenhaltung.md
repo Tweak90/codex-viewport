@@ -4,7 +4,7 @@
 
 ## Zwei Schnittstellenebenen
 
-Die Browser-API von Codex-Web und das native App-Server-Protokoll sind getrennt. Der Webserver prüft Browseranmeldung und CSRF-Schutz, verwaltet eigene Metadaten und übersetzt Benutzeraktionen in erlaubte native RPC-Aufrufe.
+Die Browser-API von Codex Viewport und das native App-Server-Protokoll sind getrennt. Der Webserver prüft Browseranmeldung und CSRF-Schutz, verwaltet eigene Metadaten und übersetzt Benutzeraktionen in erlaubte native RPC-Aufrufe.
 
 | Browser-Endpunkt | Aufgabe |
 | --- | --- |
@@ -47,7 +47,7 @@ Eine Kontingent-Rücksetzung besitzt einen Idempotenzschlüssel und erfordert ei
 | Web-Volume: `workbench.json` | Pins, Eingabeentwürfe, beobachtete Aufgaben und Kontextwerte |
 | Web-Volume: `search-index.json` | Durchsuchbare Textinhalte und Fundstellen |
 | Codex-Host | Native Chats, Anmeldung, Werkzeuge und Projektdateien |
-| Projekt: `.codex-web/uploads/` | Hochgeladene Anhänge |
+| Projekt: `.codex-viewport/uploads/` | Hochgeladene Anhänge |
 | Browser-Speicher | Darstellungswahl, Panelbreiten, Navigation und zwischengespeicherte Eingaben |
 
 Die Web-Daten werden als JSON mit atomarem Dateiaustausch geschrieben. Schreibwarteschlangen verhindern, dass parallele Aktualisierungen dieselbe Datei unkontrolliert überschreiben. Die Ersteinrichtung des Passworts verwendet eine exklusive Dateianlage.

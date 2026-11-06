@@ -2,7 +2,7 @@
 
 [English](en-Installation.md) · [Deutsche Startseite](de-Home.md)
 
-Codex-Web ist ein Docker-Webclient für eine **vorhandene externe Codex-App-Server-API**. Die Verbindung läuft ausschließlich über `ws://` oder `wss://`. Codex-Anmeldung, Projektdateien und Werkzeuge bleiben auf dem Codex-Host. Dieses Projekt wird auf dem Web-Host installiert und startet oder enthält keinen Codex-Prozess.
+Codex Viewport ist ein Docker-Webclient für eine **vorhandene externe Codex-App-Server-API**. Die Verbindung läuft ausschließlich über `ws://` oder `wss://`. Codex-Anmeldung, Projektdateien und Werkzeuge bleiben auf dem Codex-Host. Dieses Projekt wird auf dem Web-Host installiert und startet oder enthält keinen Codex-Prozess.
 
 ## Voraussetzungen
 
@@ -26,12 +26,12 @@ HOST_LABEL=Codex-Host
 Beispielhost und Token durch die Werte deines API-Endpunkts ersetzen. `CODEX_API_TOKEN` leer lassen, wenn der Endpunkt keinen Token verlangt.
 
 ```bash
-docker volume create codex-web-data
-docker pull ghcr.io/tweak90/codex-web-ui:latest
-docker run -d --name codex-web --restart unless-stopped --init \
+docker volume create codex-viewport-data
+docker pull ghcr.io/tweak90/codex-viewport-ui:latest
+docker run -d --name codex-viewport --restart unless-stopped --init \
   -p 8787:8787 --env-file .env.web \
-  -v codex-web-data:/data \
-  ghcr.io/tweak90/codex-web-ui:latest
+  -v codex-viewport-data:/data \
+  ghcr.io/tweak90/codex-viewport-ui:latest
 ```
 
 Das öffentliche Image unterstützt Linux/amd64. Registry-Anmeldung, Git-Checkout und eigener Build sind nicht nötig. Für ein eingeschränktes Fork-Image zuerst mit einem leseberechtigten Konto `docker login` ausführen.
@@ -43,8 +43,8 @@ Das öffentliche Image unterstützt Linux/amd64. Registry-Anmeldung, Git-Checkou
 Quellcode auf dem Web-Host auschecken:
 
 ```bash
-git clone https://github.com/Tweak90/codex-web.git
-cd codex-web
+git clone https://github.com/Tweak90/codex-viewport.git
+cd codex-viewport
 cp .env.example .env
 ```
 
@@ -60,7 +60,7 @@ Oder das Web-Image aus dem Quellcode bauen:
 docker compose up -d --build
 ```
 
-Beide Konfigurationen verbinden sich mit der externen API. Die Web-Daten bleiben im Volume `console-data` unter `/data`.
+Beide Konfigurationen verbinden sich mit der externen API. Die Web-Daten bleiben unter `/data` im mit `CODEX_VIEWPORT_VOLUME` gewählten Volume (Standard: `codex-viewport-data`).
 
 ## Node direkt für die Entwicklung starten
 

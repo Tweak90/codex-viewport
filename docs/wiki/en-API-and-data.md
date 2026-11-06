@@ -4,7 +4,7 @@
 
 ## Two API layers
 
-Codex-Web's browser API is separate from the native App Server protocol. The web server checks sign-in and CSRF, manages local metadata and translates actions into permitted native RPCs.
+Codex Viewport's browser API is separate from the native App Server protocol. The web server checks sign-in and CSRF, manages local metadata and translates actions into permitted native RPCs.
 
 | Browser endpoint | Purpose |
 | --- | --- |
@@ -53,7 +53,7 @@ Follow-ups can use `thread/queue/add` and `thread/queue/list`. The web server st
 | Web volume: `workbench.json` | Pins, input drafts, tasks and context values |
 | Web volume: `search-index.json` | Searchable text and history locations |
 | Codex host | Native chats, sign-in, tools and project files; submitted answers and queued input |
-| Project: `.codex-web/uploads/` | Uploaded attachments |
+| Project: `.codex-viewport/uploads/` | Uploaded attachments |
 | Browser storage | Theme, panel sizes, language, navigation and cached drafts |
 
 JSON writes replace files atomically. Write queues serialize updates; initial password setup creates its file exclusively. Secret settings are never included in browser API responses.

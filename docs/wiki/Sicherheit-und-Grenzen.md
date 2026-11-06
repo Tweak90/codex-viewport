@@ -41,4 +41,4 @@ Eingebettete Plugin-Oberflächen und Computer-Use-Ansichten der offiziellen App 
 
 Persönliche Pfade, private Netzadressen, Schlüssel, `.env`, Runtime-Daten, Uploads und Testbilder gehören nicht ins Repository oder in Release-Archive. Die Prüfungen untersuchen den Dateistand und auf Wunsch die erreichbare Historie; ein Muster-Scan kann unbekannte oder verschlüsselte Zugangsdaten nicht sicher ausschließen. Bei einem echten Schlüsselfund ist der Schlüssel beim Anbieter zu widerrufen.
 
-Die [Veröffentlichungsprüfung im Repository](https://github.com/Tweak90/codex-web/blob/main/docs/publication.md) beschreibt die zusätzlichen Artefakt- und Historienprüfungen. Unbekannte Prüfbereiche müssen als solche dokumentiert werden.
+Die [Veröffentlichungsprüfung im Repository](https://github.com/Tweak90/codex-viewport/blob/main/docs/publication.md) beschreibt die zusätzlichen Artefakt- und Historienprüfungen. Unbekannte Prüfbereiche müssen als solche dokumentiert werden.
